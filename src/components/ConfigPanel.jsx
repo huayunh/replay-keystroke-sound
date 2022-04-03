@@ -6,26 +6,44 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField, Button } from '@mui/material';
 
 // icons
 import CloseIcon from '@mui/icons-material/Close';
 
 // redux
 import { useSelector, useDispatch } from 'react-redux';
-import { closeConfigPanel } from '../redux/appSlice';
-import { changeTrainingSubjectA, changeTrainingSubjectB, changeTestSubject } from '../redux/subjectSlice';
+import { closeConfigPanel, clearPlayingClip, clearTimeoutIDs } from '../redux/appSlice';
+import {
+    changeTrainingSubjectA,
+    changeTrainingSubjectB,
+    changeTestSubject,
+    randomizeSubjects,
+} from '../redux/subjectSlice';
+import { logAction, clearLog } from '../redux/logSlice';
 import {
     setSilenceBetweenReps as _setSilenceBetweenReps,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
     setPlaybackSpeed,
 } from '../redux/playbackSlice';
 
-import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps } from '../shared/utils';
+import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps, download } from '../shared/utils';
+import { CONFIG_PANEL_WIDTH } from '../shared/constants';
 import Data from '../assets/data.json';
 
 const boxStyle = {
-    width: 300,
+    width: CONFIG_PANEL_WIDTH,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+};
+
+const getSubjectSelectMenuItem = () => {
+    return Data.subjects.map((subjectName, index) => (
+        <MenuItem key={index} value={subjectName}>
+            {subjectName}
+        </MenuItem>
+    ));
 };
 
 const ConfigPanel = () => {
@@ -37,36 +55,43 @@ const ConfigPanel = () => {
     const _repsPerTrainingClip = useSelector((state) => state.playback.repsPerTrainingClip);
     const _silenceBetweenReps = useSelector((state) => state.playback.silenceBetweenReps);
     const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
+    const logText = useSelector((state) => state.log.logText);
 
     const [repsPerTrainingClip, setRepsPerTrainingClip] = React.useState(_repsPerTrainingClip);
     const [silenceBetweenReps, setSilenceBetweenReps] = React.useState(_silenceBetweenReps);
 
-    const HandleClickCloseIcon = () => {
+    const handleClickCloseIcon = React.useCallback(() => {
         dispatch(closeConfigPanel());
-    };
+    }, [dispatch]);
 
-    const getSubjectSelectMenuItem = () => {
-        return Data.subjects.map((subjectName, index) => (
-            <MenuItem key={index} value={subjectName}>
-                {subjectName}
-            </MenuItem>
-        ));
-    };
+    const handleDownload = React.useCallback(() => {
+        dispatch(clearPlayingClip());
+        dispatch(clearTimeoutIDs());
+        dispatch(logAction('Download session log and clear data.'));
+        download('data.log', logText);
+        dispatch(clearLog());
+        dispatch(randomizeSubjects());
+    }, [dispatch, logText]);
 
     return (
         <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
             <Box sx={boxStyle}>
                 <Box margin={2}>
-                    <IconButton onClick={HandleClickCloseIcon}>
+                    <IconButton onClick={handleClickCloseIcon}>
                         <CloseIcon />
                     </IconButton>
                     <Typography variant={'H5'}>Settings</Typography>
                     <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
                 </Box>
-                <Stack spacing={3} margin={2} marginTop={4} divider={<Divider flexItem />}>
+                <Stack spacing={4} margin={2} marginTop={4} divider={<Divider flexItem />}>
                     {/* Text Clip */}
                     <FormControl>
-                        <InputLabel id="test-subject">Test Clip</InputLabel>
+                        <InputLabel
+                            id="test-subject"
+                            error={![trainingSubjectA, trainingSubjectB].includes(testSubject)}
+                        >
+                            Test Clip
+                        </InputLabel>
                         <Select
                             labelId="test-subject"
                             value={[trainingSubjectA, trainingSubjectB].includes(testSubject) ? testSubject : ''}
@@ -74,6 +99,7 @@ const ConfigPanel = () => {
                             onChange={(event) => {
                                 dispatch(changeTestSubject(event.target.value));
                             }}
+                            error={![trainingSubjectA, trainingSubjectB].includes(testSubject)}
                         >
                             <MenuItem value={trainingSubjectA}>{trainingSubjectA}</MenuItem>
                             <MenuItem value={trainingSubjectB}>{trainingSubjectB}</MenuItem>
@@ -161,6 +187,15 @@ const ConfigPanel = () => {
                             <MenuItem value={1.25}>x1.25</MenuItem>
                         </Select>
                     </FormControl>
+                </Stack>
+                <Box flex={1} />
+                <Stack margin={2} spacing={1}>
+                    <Button variant={'contained'} disableElevation onClick={handleDownload}>
+                        Download Experiment Log
+                    </Button>
+                    <Typography variant={'caption'} color={'textSecondary'}>
+                        This will download and initiate a new session.
+                    </Typography>
                 </Stack>
             </Box>
         </Drawer>

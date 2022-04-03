@@ -17,7 +17,7 @@ import KeyStrokeHardSound from '../assets/keystroke-hard.mp3';
 import KeyStrokeLightSound from '../assets/keystroke-light.wav';
 
 // redux
-import { selectClip } from '../redux/appSlice';
+import { selectClip, addTimeoutID, clearTimeoutIDs, clearPlayingClip, setPlayingClip } from '../redux/appSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const cardHovered = {
@@ -61,10 +61,9 @@ const SoundPlayerCard = (props) => {
     const { downDownTimerStart, title, clipIndex = -1, isTestSubject = false } = props;
     const [isHovered, setIsHovered] = React.useState(false);
     const [playingTimer, setPlayingTimer] = React.useState(null);
-    const [timeoutIDs, setTimeoutIDs] = React.useState([]);
-    const [isPlaying, setIsPlaying] = React.useState(false);
     const dispatch = useDispatch();
     const isSelected = useSelector((state) => state.app.selectedClip) === clipIndex && !isTestSubject;
+    const isPlaying = useSelector((state) => state.app.playingClip) === (isTestSubject ? -1 : clipIndex);
     const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
 
     const playDuration = React.useMemo(
@@ -78,6 +77,8 @@ const SoundPlayerCard = (props) => {
             return;
         }
         stopAllAudios();
+        dispatch(clearTimeoutIDs());
+        dispatch(setPlayingClip(isTestSubject ? -1 : clipIndex));
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
             const timeoutID = setTimeout(() => {
@@ -88,31 +89,32 @@ const SoundPlayerCard = (props) => {
                     audio.src = KeyStrokeLightSound;
                 }
                 document.getElementById('root-box').appendChild(audio);
-                audio.playbackRate = playbackSpeed;
-                audio.play();
+                // Not optimal when the playbackRate is less than 1
+                // audio.playbackRate = playbackSpeed;
+                audio.play().catch((reason) => {
+                    console.log(reason);
+                });
             }, downDownTimerStart[i] / playbackSpeed);
-            timeoutIDs.push(timeoutID);
+            dispatch(addTimeoutID(timeoutID));
         }
-        setIsPlaying(true);
         setPlayingTimer(
             setTimeout(() => {
-                setIsPlaying(false);
+                dispatch(clearTimeoutIDs());
+                dispatch(clearPlayingClip());
             }, playDuration)
         );
-    }, [isPlaying, downDownTimerStart, playDuration, timeoutIDs, playbackSpeed]);
+    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, isTestSubject, clipIndex]);
 
     const handleStop = React.useCallback(() => {
         console.log('handleStop');
         stopAllAudios();
-        timeoutIDs.forEach((timeoutID) => {
-            clearTimeout(timeoutID);
-        });
-        setTimeoutIDs([]);
+        dispatch(clearTimeoutIDs());
+        dispatch(clearPlayingClip());
+
         if (playingTimer !== null) {
             clearTimeout(playingTimer);
         }
-        setIsPlaying(false);
-    }, [playingTimer, timeoutIDs]);
+    }, [dispatch, playingTimer]);
 
     React.useEffect(() => {
         return () => {

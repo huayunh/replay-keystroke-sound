@@ -18,5 +18,22 @@ export const rangeValue_silenceBetweenReps = (oldVal, newVal) => {
 export const stopAllAudios = () => {
     const allAudios = document.getElementsByTagName('audio');
     // console.log(allAudios);
-    for (let i = 0; i < allAudios.length; i++) allAudios[i].pause();
+    for (let i = 0; i < allAudios.length; i++) {
+        allAudios[i].pause();
+        allAudios[i].remove();
+    }
+};
+
+export const randomItemsFromArray = (array, n) => {
+    return array.sort(() => 0.5 - Math.random()).slice(0, n);
+};
+
+export const download = (filename, text) => {
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 };
