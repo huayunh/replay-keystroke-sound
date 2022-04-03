@@ -38,20 +38,18 @@ const cardContentStyle = {
     },
 };
 
-// const progressZero = {
-//     width: 0,
-//     left: 0,
-//     top: 0,
-//     bottom: 0,
-//     position: 'absolute',
-//     backgroundColor: 'primary.light',
-//     opacity: 0.1,
-// };
-// const progressFull = {
-//     width: '100%',
-//     opacity: 0.2,
-//     transition: 'width,opacity 2000ms',
-// };
+const progressUpdatePeriod = 200;
+
+const progressZero = {
+    width: 0,
+    left: 0,
+    top: 0,
+    bottom: 0,
+    position: 'absolute',
+    backgroundColor: 'primary.light',
+    opacity: 0.1,
+    transition: `width ${progressUpdatePeriod}ms linear`,
+};
 
 const actionHovered = {
     cursor: 'pointer',
@@ -62,14 +60,15 @@ const SoundPlayerCard = (props) => {
     const { downDownTimerStart, title, clipIndex = -1, isTestSubject = false } = props;
     const [isHovered, setIsHovered] = React.useState(false);
     const [playingTimer, setPlayingTimer] = React.useState(null);
+    const [progress, setProgress] = React.useState(null);
     const dispatch = useDispatch();
     const isSelected = useSelector((state) => state.app.selectedClip) === clipIndex && !isTestSubject;
     const isPlaying = useSelector((state) => state.app.playingClip) === (isTestSubject ? -1 : clipIndex);
     const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
 
     const playDuration = React.useMemo(
-        () => downDownTimerStart[downDownTimerStart.length - 1] + 500,
-        [downDownTimerStart]
+        () => downDownTimerStart[downDownTimerStart.length - 1] * playbackSpeed + 500,
+        [downDownTimerStart, playbackSpeed]
     );
     const clipName = React.useMemo(() => (isTestSubject ? 'Test' : ['A', 'B'][clipIndex]), [isTestSubject, clipIndex]);
 
@@ -82,6 +81,7 @@ const SoundPlayerCard = (props) => {
         dispatch(clearTimeoutIDs());
         dispatch(setPlayingClip(isTestSubject ? -1 : clipIndex));
         dispatch(logAction(`Play: ${clipName}`));
+        setProgress(0);
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
             const timeoutID = setTimeout(() => {
@@ -95,15 +95,31 @@ const SoundPlayerCard = (props) => {
                 // Not optimal when the playbackRate is less than 1
                 // audio.playbackRate = playbackSpeed;
                 audio.play().catch((reason) => {
-                    console.log(reason);
+                    if (reason instanceof DOMException) {
+                        // this happens sometimes; nothing to worry about
+                    } else {
+                        console.log(reason);
+                    }
                 });
             }, downDownTimerStart[i] / playbackSpeed);
             dispatch(addTimeoutID(timeoutID));
         }
+        const progressTimeoutID = setInterval(() => {
+            setProgress((oldProgress) => {
+                if (oldProgress === null) return null;
+                if (oldProgress >= 100) {
+                    return null;
+                }
+                return oldProgress + 100 / (playDuration / progressUpdatePeriod);
+            });
+        }, progressUpdatePeriod);
+        dispatch(addTimeoutID(progressTimeoutID));
         setPlayingTimer(
             setTimeout(() => {
                 dispatch(clearTimeoutIDs());
                 dispatch(clearPlayingClip());
+                setProgress(null);
+                clearInterval(progressTimeoutID);
             }, playDuration)
         );
     }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, isTestSubject, clipIndex, clipName]);
@@ -113,7 +129,7 @@ const SoundPlayerCard = (props) => {
         stopAllAudios();
         dispatch(clearTimeoutIDs());
         dispatch(clearPlayingClip());
-
+        setProgress(0);
         if (playingTimer !== null) {
             clearTimeout(playingTimer);
         }
@@ -152,6 +168,7 @@ const SoundPlayerCard = (props) => {
                         {title}
                     </Typography>
                 </Box>
+                {isPlaying && progress !== null && <Box sx={[progressZero, { width: `${progress}%` }]} />}
             </CardContent>
             {!isTestSubject && (
                 <>

@@ -110,7 +110,7 @@ function ChooseClipPage() {
                         )}
                     />
                 </Stack>
-                <Stack spacing={2} direction={'row'}>
+                <Stack spacing={2} direction={'row-reverse'}>
                     <Button
                         variant={'contained'}
                         disableElevation
