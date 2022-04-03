@@ -1,12 +1,16 @@
+import * as React from 'react';
+
 import SoundPlayerCard from '../components/SoundPlayerCard';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Fade from '@mui/material/Fade';
+import DoneIcon from '@mui/icons-material/Done';
 
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import { clearSelectedClip } from '../redux/appSlice';
+import { clearPlayingClip, clearSelectedClip, clearTimeoutIDs } from '../redux/appSlice';
 import { randomizeSubjects } from '../redux/subjectSlice';
 import { logAction, clearLog } from '../redux/logSlice';
 
@@ -53,12 +57,19 @@ function ChooseClipPage() {
     const testSubject = useSelector((state) => state.subject.testSubject);
     const trainingSubjectA = useSelector((state) => state.subject.trainingSubjectA);
     const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
+    const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
 
     const handleSubmit = () => {
         dispatch(clearSelectedClip());
+        dispatch(clearPlayingClip());
+        dispatch(clearTimeoutIDs());
         dispatch(logAction(`Submit: ${['A', 'B'][selectedClip]}. \n---`));
         dispatch(randomizeSubjects());
         dispatch(logAction(`New: A=${trainingSubjectA}, B=${trainingSubjectB}, Test=${testSubject}.`));
+        setShowSubmitMessage(true);
+        setTimeout(() => {
+            setShowSubmitMessage(false);
+        }, 1500);
     };
     useEffect(() => {
         dispatch(clearLog());
@@ -99,7 +110,7 @@ function ChooseClipPage() {
                         )}
                     />
                 </Stack>
-                <Box>
+                <Stack spacing={2} direction={'row'}>
                     <Button
                         variant={'contained'}
                         disableElevation
@@ -109,7 +120,13 @@ function ChooseClipPage() {
                     >
                         Submit
                     </Button>
-                </Box>
+                    <Fade in={showSubmitMessage}>
+                        <Stack spacing={0.5} direction={'row'} alignItems={'center'} color={'success.main'}>
+                            <DoneIcon />
+                            <Typography variant={'body2'}>Submitted</Typography>
+                        </Stack>
+                    </Fade>
+                </Stack>
             </Stack>
         </Box>
     );

@@ -18,6 +18,7 @@ import KeyStrokeLightSound from '../assets/keystroke-light.wav';
 
 // redux
 import { selectClip, addTimeoutID, clearTimeoutIDs, clearPlayingClip, setPlayingClip } from '../redux/appSlice';
+import { logAction } from '../redux/logSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const cardHovered = {
@@ -70,6 +71,7 @@ const SoundPlayerCard = (props) => {
         () => downDownTimerStart[downDownTimerStart.length - 1] + 500,
         [downDownTimerStart]
     );
+    const clipName = React.useMemo(() => (isTestSubject ? 'Test' : ['A', 'B'][clipIndex]), [isTestSubject, clipIndex]);
 
     const handlePlay = React.useCallback(() => {
         console.log('handlePlay');
@@ -79,6 +81,7 @@ const SoundPlayerCard = (props) => {
         stopAllAudios();
         dispatch(clearTimeoutIDs());
         dispatch(setPlayingClip(isTestSubject ? -1 : clipIndex));
+        dispatch(logAction(`Play: ${clipName}`));
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
             const timeoutID = setTimeout(() => {
@@ -103,7 +106,7 @@ const SoundPlayerCard = (props) => {
                 dispatch(clearPlayingClip());
             }, playDuration)
         );
-    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, isTestSubject, clipIndex]);
+    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, isTestSubject, clipIndex, clipName]);
 
     const handleStop = React.useCallback(() => {
         console.log('handleStop');
@@ -159,6 +162,7 @@ const SoundPlayerCard = (props) => {
                         sx={{ '&:hover': actionHovered }}
                         onClick={() => {
                             dispatch(selectClip(clipIndex));
+                            dispatch(logAction(`Select: ${clipName}`));
                         }}
                     >
                         <Typography variant={'button'} color={isSelected ? 'secondary.main' : 'primary.main'}>

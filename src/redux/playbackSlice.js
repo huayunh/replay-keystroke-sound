@@ -4,7 +4,7 @@ import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps } from '.
 export const playbackSlice = createSlice({
     name: 'playback',
     initialState: {
-        repsPerTrainingClip: 5, // between 1 and (<number of reps in data.json> - 1)
+        repsPerTrainingClip: 3, // between 1 and (<number of reps in data.json> - 1)
         silenceBetweenReps: 1500, // in milisecond
         playbackSpeed: 1.0,
     },

@@ -194,7 +194,7 @@ const ConfigPanel = () => {
                         Download Experiment Log
                     </Button>
                     <Typography variant={'caption'} color={'textSecondary'}>
-                        This will download and initiate a new session.
+                        This will download data and initiate a new session.
                     </Typography>
                 </Stack>
             </Box>

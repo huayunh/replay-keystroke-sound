@@ -17,7 +17,6 @@ export const rangeValue_silenceBetweenReps = (oldVal, newVal) => {
 
 export const stopAllAudios = () => {
     const allAudios = document.getElementsByTagName('audio');
-    // console.log(allAudios);
     for (let i = 0; i < allAudios.length; i++) {
         allAudios[i].pause();
         allAudios[i].remove();
