@@ -58,6 +58,7 @@ function ChooseClipPage() {
     const trainingSubjectA = useSelector((state) => state.subject.trainingSubjectA);
     const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
+    const [showPageBody, setShowPageBody] = React.useState(true);
 
     const handleSubmit = () => {
         dispatch(clearSelectedClip());
@@ -66,10 +67,16 @@ function ChooseClipPage() {
         dispatch(logAction(`Submit: ${['A', 'B'][selectedClip]}. \n---`));
         dispatch(randomizeSubjects());
         dispatch(logAction(`New: A=${trainingSubjectA}, B=${trainingSubjectB}, Test=${testSubject}.`));
+
         setShowSubmitMessage(true);
         setTimeout(() => {
             setShowSubmitMessage(false);
         }, 1500);
+
+        setShowPageBody(false);
+        setTimeout(() => {
+            setShowPageBody(true);
+        }, 500);
     };
     useEffect(() => {
         dispatch(clearLog());
@@ -81,35 +88,39 @@ function ChooseClipPage() {
     return (
         <Box sx={[styles.pageRoot, isConfigPanelOpen && styles.pageRootConfigPanelOpen]}>
             <Stack direction={'column'} spacing={4} sx={{ width: 600, margin: '32px auto 0' }}>
-                <SoundPlayerCard
-                    title={'Test Clip'}
-                    isTestSubject
-                    downDownTimerStart={getDownDownStartTimes([Data[testSubject][0]], 0)}
-                />
-                <Stack direction={'column'} spacing={2}>
-                    <Typography variant={'h4'}>Who typed the Test Clip?</Typography>
-                    <Typography variant={'Body1'}>
-                        Listen to the two typing samples below, and make your best guess.
-                    </Typography>
-                </Stack>
-                <Stack direction={'row'} spacing={2}>
-                    <SoundPlayerCard
-                        title={'Subject A'}
-                        clipIndex={0}
-                        downDownTimerStart={getDownDownStartTimes(
-                            Data[trainingSubjectA].slice(-repsPerTrainingClip),
-                            silenceBetweenReps
-                        )}
-                    />
-                    <SoundPlayerCard
-                        title={'Subject B'}
-                        clipIndex={1}
-                        downDownTimerStart={getDownDownStartTimes(
-                            Data[trainingSubjectB].slice(-repsPerTrainingClip),
-                            silenceBetweenReps
-                        )}
-                    />
-                </Stack>
+                <Fade in={showPageBody}>
+                    <Stack direction={'column'} spacing={4}>
+                        <SoundPlayerCard
+                            title={'Test Clip'}
+                            isTestSubject
+                            downDownTimerStart={getDownDownStartTimes([Data[testSubject][0]], 0)}
+                        />
+                        <Stack direction={'column'} spacing={2}>
+                            <Typography variant={'h4'}>Who typed the Test Clip?</Typography>
+                            <Typography variant={'Body1'}>
+                                Listen to the two typing samples below, and make your best guess.
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} spacing={2}>
+                            <SoundPlayerCard
+                                title={'Subject A'}
+                                clipIndex={0}
+                                downDownTimerStart={getDownDownStartTimes(
+                                    Data[trainingSubjectA].slice(-repsPerTrainingClip),
+                                    silenceBetweenReps
+                                )}
+                            />
+                            <SoundPlayerCard
+                                title={'Subject B'}
+                                clipIndex={1}
+                                downDownTimerStart={getDownDownStartTimes(
+                                    Data[trainingSubjectB].slice(-repsPerTrainingClip),
+                                    silenceBetweenReps
+                                )}
+                            />
+                        </Stack>
+                    </Stack>
+                </Fade>
                 <Stack spacing={2} direction={'row-reverse'}>
                     <Button
                         variant={'contained'}
