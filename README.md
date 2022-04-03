@@ -1,13 +1,5 @@
-# replay-keystroke-sound
+Identify who's the mysterious typist.
 
-Replay the sound of someone typing
+To run, do `yarn && yarn start`.
 
-## For Maintainers
-
-Run
-
-```
-npx http-server
-```
-
-And you shall see stuff on `http://localhost:8080/`
+To build data, do `yarn update-data`
