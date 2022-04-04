@@ -20,7 +20,7 @@ export const subjectSlice = createSlice({
             state.trainingSubjectB = action.payload;
         },
         randomizeSubjects: (state) => {
-            const randomSubjects = randomItemsFromArray(Data.subjects, 2);
+            const randomSubjects = randomItemsFromArray(Data.subjects.slice(), 2);
             state.testSubject = randomSubjects[Math.round(Math.random())];
             state.trainingSubjectA = randomSubjects[0];
             state.trainingSubjectB = randomSubjects[1];

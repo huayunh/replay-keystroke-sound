@@ -57,7 +57,7 @@ const actionHovered = {
 };
 
 const SoundPlayerCard = (props) => {
-    const { downDownTimerStart, title, clipIndex = -1, isTestSubject = false } = props;
+    const { downDownTimerStart, title, clipIndex = -1, isTestSubject = false, disabled = false } = props;
     const [isHovered, setIsHovered] = React.useState(false);
     const [playingTimer, setPlayingTimer] = React.useState(null);
     const [progress, setProgress] = React.useState(null);
@@ -67,7 +67,7 @@ const SoundPlayerCard = (props) => {
     const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
 
     const playDuration = React.useMemo(
-        () => downDownTimerStart[downDownTimerStart.length - 1] * playbackSpeed + 500,
+        () => downDownTimerStart[downDownTimerStart.length - 1] / playbackSpeed + 500,
         [downDownTimerStart, playbackSpeed]
     );
     const clipName = React.useMemo(() => (isTestSubject ? 'Test' : ['A', 'B'][clipIndex]), [isTestSubject, clipIndex]);
@@ -108,7 +108,7 @@ const SoundPlayerCard = (props) => {
             setProgress((oldProgress) => {
                 if (oldProgress === null) return null;
                 if (oldProgress >= 100) {
-                    return null;
+                    return 100;
                 }
                 return oldProgress + 100 / (playDuration / progressUpdatePeriod);
             });
@@ -178,11 +178,17 @@ const SoundPlayerCard = (props) => {
                         onMouseLeave={() => setIsHovered(false)}
                         sx={{ '&:hover': actionHovered }}
                         onClick={() => {
+                            if (disabled) {
+                                return;
+                            }
                             dispatch(selectClip(clipIndex));
                             dispatch(logAction(`Select: ${clipName}`));
                         }}
                     >
-                        <Typography variant={'button'} color={isSelected ? 'secondary.main' : 'primary.main'}>
+                        <Typography
+                            variant={'button'}
+                            color={disabled ? 'text.disabled' : isSelected ? 'secondary.main' : 'primary.main'}
+                        >
                             {isSelected ? 'Selected' : 'Select'}
                         </Typography>
                     </CardActions>

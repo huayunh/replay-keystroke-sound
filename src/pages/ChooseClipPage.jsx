@@ -59,6 +59,7 @@ function ChooseClipPage() {
     const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
     const [showPageBody, setShowPageBody] = React.useState(true);
+    const [testClipListened, setTestClipListened] = React.useState(false);
 
     const handleSubmit = () => {
         dispatch(clearSelectedClip());
@@ -90,11 +91,17 @@ function ChooseClipPage() {
             <Stack direction={'column'} spacing={4} sx={{ width: 600, margin: '32px auto 0' }}>
                 <Fade in={showPageBody}>
                     <Stack direction={'column'} spacing={4}>
-                        <SoundPlayerCard
-                            title={'Test Clip'}
-                            isTestSubject
-                            downDownTimerStart={getDownDownStartTimes([Data[testSubject][0]], 0)}
-                        />
+                        <Box
+                            onClick={() => {
+                                setTestClipListened(true);
+                            }}
+                        >
+                            <SoundPlayerCard
+                                title={'Test Clip'}
+                                isTestSubject
+                                downDownTimerStart={getDownDownStartTimes([Data[testSubject][0]], 0)}
+                            />
+                        </Box>
                         <Stack direction={'column'} spacing={2}>
                             <Typography variant={'h4'}>Who typed the Test Clip?</Typography>
                             <Typography variant={'Body1'}>
@@ -109,6 +116,7 @@ function ChooseClipPage() {
                                     Data[trainingSubjectA].slice(-repsPerTrainingClip),
                                     silenceBetweenReps
                                 )}
+                                disabled={!testClipListened}
                             />
                             <SoundPlayerCard
                                 title={'Subject B'}
@@ -117,6 +125,7 @@ function ChooseClipPage() {
                                     Data[trainingSubjectB].slice(-repsPerTrainingClip),
                                     silenceBetweenReps
                                 )}
+                                disabled={!testClipListened}
                             />
                         </Stack>
                     </Stack>
@@ -126,7 +135,7 @@ function ChooseClipPage() {
                         variant={'contained'}
                         disableElevation
                         onClick={handleSubmit}
-                        disabled={selectedClip === -1}
+                        disabled={selectedClip === -1 || !testClipListened}
                         color={'secondary'}
                     >
                         Submit
