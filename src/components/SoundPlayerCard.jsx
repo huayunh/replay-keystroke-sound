@@ -168,7 +168,7 @@ const SoundPlayerCard = (props) => {
                         {title}
                     </Typography>
                 </Box>
-                {isPlaying && progress !== null && <Box sx={[progressZero, { width: `${progress}%` }]} />}
+                {isPlaying && progress !== null && <Box sx={progressZero} style={{ width: `${progress}%` }} />}
             </CardContent>
             {!isTestSubject && (
                 <>

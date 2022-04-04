@@ -10,7 +10,7 @@ import DoneIcon from '@mui/icons-material/Done';
 
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import { clearPlayingClip, clearSelectedClip, clearTimeoutIDs } from '../redux/appSlice';
+import { clearPlayingClip, clearSelectedClip, clearTimeoutIDs, nextPage } from '../redux/appSlice';
 import { randomizeSubjects } from '../redux/subjectSlice';
 import { logAction, clearLog } from '../redux/logSlice';
 
@@ -66,8 +66,11 @@ function ChooseClipPage() {
         dispatch(clearPlayingClip());
         dispatch(clearTimeoutIDs());
         dispatch(logAction(`Submit: ${['A', 'B'][selectedClip]}. \n---`));
+        dispatch(nextPage());
         dispatch(randomizeSubjects());
         dispatch(logAction(`New: A=${trainingSubjectA}, B=${trainingSubjectB}, Test=${testSubject}.`));
+
+        setTestClipListened(false);
 
         setShowSubmitMessage(true);
         setTimeout(() => {

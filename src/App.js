@@ -1,14 +1,16 @@
 import Fab from './components/Fab';
 import ConfigPanel from './components/ConfigPanel';
-import ChooseClipPage from './pages/ChooseClipPage';
+import { getPage } from './pages';
 import Box from '@mui/material/Box';
+import { useSelector } from 'react-redux';
 
 function App() {
+    const currentPage = useSelector((state) => state.app.currentPage);
     return (
         <Box id={'root-box'}>
             <ConfigPanel />
             <Fab />
-            <ChooseClipPage />
+            {getPage(currentPage)}
         </Box>
     );
 }

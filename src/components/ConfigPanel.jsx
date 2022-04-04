@@ -6,6 +6,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField, Button } from '@mui/material';
 
 // icons
@@ -13,14 +15,14 @@ import CloseIcon from '@mui/icons-material/Close';
 
 // redux
 import { useSelector, useDispatch } from 'react-redux';
-import { closeConfigPanel, clearPlayingClip, clearTimeoutIDs } from '../redux/appSlice';
+import { closeConfigPanel, clearPlayingClip, clearTimeoutIDs, toggleFABVisibility } from '../redux/appSlice';
 import {
     changeTrainingSubjectA,
     changeTrainingSubjectB,
     changeTestSubject,
     randomizeSubjects,
 } from '../redux/subjectSlice';
-import { logAction, clearLog } from '../redux/logSlice';
+import { clearLog } from '../redux/logSlice';
 import {
     setSilenceBetweenReps as _setSilenceBetweenReps,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
@@ -49,6 +51,7 @@ const getSubjectSelectMenuItem = () => {
 const ConfigPanel = () => {
     const dispatch = useDispatch();
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
+    const invisibleFAB = useSelector((state) => state.app.invisibleFAB);
     const testSubject = useSelector((state) => state.subject.testSubject);
     const trainingSubjectA = useSelector((state) => state.subject.trainingSubjectA);
     const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
@@ -67,7 +70,6 @@ const ConfigPanel = () => {
     const handleDownload = React.useCallback(() => {
         dispatch(clearPlayingClip());
         dispatch(clearTimeoutIDs());
-        dispatch(logAction('Download session log and clear data.'));
         download('data.log', logText);
         dispatch(clearLog());
         dispatch(randomizeSubjects());
@@ -77,10 +79,12 @@ const ConfigPanel = () => {
         <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
             <Box sx={boxStyle}>
                 <Box margin={2}>
-                    <IconButton onClick={handleClickCloseIcon}>
-                        <CloseIcon />
-                    </IconButton>
-                    <Typography variant={'H5'}>Settings</Typography>
+                    <Stack direction={'row'} spacing={2} alignItems={'center'} marginBottom={1}>
+                        <IconButton onClick={handleClickCloseIcon} edge={'start'}>
+                            <CloseIcon />
+                        </IconButton>
+                        <Typography variant={'h5'}>Settings</Typography>
+                    </Stack>
                     <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
                 </Box>
                 <Stack spacing={4} margin={2} marginTop={4} divider={<Divider flexItem />}>
@@ -170,23 +174,36 @@ const ConfigPanel = () => {
                             }}
                         />
                     </Stack>
-                    {/* Play Controls */}
-                    <FormControl>
-                        <InputLabel id="playback-speed">Playback Speed</InputLabel>
-                        <Select
-                            labelId="playback-speed"
-                            value={playbackSpeed}
-                            label="Playback Speed"
-                            onChange={(event) => {
-                                dispatch(setPlaybackSpeed(event.target.value));
-                            }}
-                        >
-                            <MenuItem value={0.5}>x0.5</MenuItem>
-                            <MenuItem value={0.75}>x0.75</MenuItem>
-                            <MenuItem value={1.0}>x1.0</MenuItem>
-                            <MenuItem value={1.25}>x1.25</MenuItem>
-                        </Select>
-                    </FormControl>
+                    {/* MISC Controls */}
+                    <Stack direction="column" spacing={2}>
+                        <FormControl>
+                            <InputLabel id="playback-speed">Playback Speed</InputLabel>
+                            <Select
+                                labelId="playback-speed"
+                                value={playbackSpeed}
+                                label="Playback Speed"
+                                onChange={(event) => {
+                                    dispatch(setPlaybackSpeed(event.target.value));
+                                }}
+                            >
+                                <MenuItem value={0.5}>x0.5</MenuItem>
+                                <MenuItem value={0.75}>x0.75</MenuItem>
+                                <MenuItem value={1.0}>x1.0</MenuItem>
+                                <MenuItem value={1.25}>x1.25</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={invisibleFAB}
+                                    onChange={() => {
+                                        dispatch(toggleFABVisibility());
+                                    }}
+                                />
+                            }
+                            label="Hide Config Panel Button"
+                        />
+                    </Stack>
                 </Stack>
                 <Box flex={1} />
                 <Stack margin={2} spacing={1}>

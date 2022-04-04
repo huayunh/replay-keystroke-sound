@@ -7,6 +7,8 @@ export const appSlice = createSlice({
         selectedClip: -1,
         timeoutIDs: [],
         playingClip: -2, // test = -1, subject A = 0, subject B = 1
+        currentPage: 0,
+        invisibleFAB: true,
     },
     reducers: {
         openConfigPanel: (state) => {
@@ -36,6 +38,12 @@ export const appSlice = createSlice({
         setPlayingClip: (state, action) => {
             state.playingClip = action.payload;
         },
+        nextPage: (state) => {
+            state.currentPage += 1;
+        },
+        toggleFABVisibility: (state) => {
+            state.invisibleFAB = !state.invisibleFAB;
+        },
     },
 });
 
@@ -48,6 +56,8 @@ export const {
     clearTimeoutIDs,
     clearPlayingClip,
     setPlayingClip,
+    nextPage,
+    toggleFABVisibility,
 } = appSlice.actions;
 
 export default appSlice.reducer;
