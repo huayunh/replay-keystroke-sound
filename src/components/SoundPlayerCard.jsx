@@ -196,8 +196,7 @@ const SoundPlayerCard = (props) => {
                             if (disableSelectButton) {
                                 return;
                             }
-                            dispatch(selectAnswer(clipIndex));
-                            dispatch(logAction(`Select: ${title}`));
+                            dispatch(selectAnswer({ index: clipIndex, text: title }));
                         }}
                     >
                         <Typography

@@ -87,25 +87,27 @@ const ConfigPanel = () => {
                     </Stack>
                     <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
                 </Box>
-                <Stack spacing={4} margin={2} marginTop={4} divider={<Divider flexItem />}>
-                    <FormControl>
-                        <InputLabel id="preset">Preset</InputLabel>
-                        <Select
-                            labelId="preset"
-                            value={preset === null ? 'Random' : preset}
-                            label="Preset"
-                            onChange={(event) => {
-                                dispatch(setPreset(event.target.value));
-                            }}
-                        >
-                            <MenuItem value={'Random'}>Random</MenuItem>
-                            <Divider />
-                            <MenuItem value={'Preset A'}>Preset A</MenuItem>
-                        </Select>
-                    </FormControl>
-                    {/* Test Clip */}
-                    <Stack direction={'column'} spacing={3}>
+                <Stack spacing={4} margin={2} marginTop={3} divider={<Divider flexItem />}>
+                    <Stack direction={'column'} spacing={2}>
+                        {/* Preset */}
                         <FormControl>
+                            <InputLabel id="preset">Preset</InputLabel>
+                            <Select
+                                labelId="preset"
+                                value={preset}
+                                label="Preset"
+                                onChange={(event) => {
+                                    dispatch(setPreset(event.target.value));
+                                }}
+                            >
+                                <MenuItem value={'Random'}>Random</MenuItem>
+                                <Divider />
+                                <MenuItem value={'Preset A'}>Preset A</MenuItem>
+                                <MenuItem value={'Preset B'}>Preset B</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {/* Test Clip */}
+                        <FormControl disabled={preset !== 'Random'}>
                             <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
                                 Test Clip
                             </InputLabel>
@@ -128,7 +130,7 @@ const ConfigPanel = () => {
                         {/* Subjects */}
                         <Stack direction={'row'} spacing={2}>
                             {currentTrainingSubjectNameList.map((subjectName, subjectIndex) => (
-                                <FormControl fullWidth key={subjectIndex}>
+                                <FormControl fullWidth key={subjectIndex} disabled={preset !== 'Random'}>
                                     <InputLabel id="training-subject-a">Subject {subjectIndex + 1}</InputLabel>
                                     <Select
                                         labelId="training-subject-a"
@@ -148,6 +150,9 @@ const ConfigPanel = () => {
                                 </FormControl>
                             ))}
                         </Stack>
+                    </Stack>
+                    {/* MISC Controls */}
+                    <Stack direction="column" spacing={2}>
                         <TextField
                             label="Reps for Each Subject Clip"
                             variant="outlined"
@@ -182,9 +187,6 @@ const ConfigPanel = () => {
                                 endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                             }}
                         />
-                    </Stack>
-                    {/* MISC Controls */}
-                    <Stack direction="column" spacing={2}>
                         <FormControl>
                             <InputLabel id="playback-speed">Playback Speed</InputLabel>
                             <Select
@@ -219,9 +221,6 @@ const ConfigPanel = () => {
                     <Button variant={'contained'} disableElevation onClick={handleDownload}>
                         Download Experiment Log
                     </Button>
-                    <Typography variant={'caption'} color={'textSecondary'}>
-                        This will download data and initiate a new session.
-                    </Typography>
                 </Stack>
             </Box>
         </Drawer>

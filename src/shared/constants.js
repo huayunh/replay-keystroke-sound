@@ -1,6 +1,3 @@
-// export const SESSION = 7;
-// export const REP = 49;
-
 /* the password is: .tie5Roanl
  */
 export const KEYS = ['period', 't', 'i', 'e', 'five', 'Shift.r', 'o', 'a', 'n', 'l', 'Return'];
