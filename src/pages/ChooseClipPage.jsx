@@ -5,18 +5,16 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Fade from '@mui/material/Fade';
 import DoneIcon from '@mui/icons-material/Done';
 
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import { clearPlayingClip, clearSelectedClip, clearTimeoutIDs, nextPage } from '../redux/appSlice';
-import { randomizeSubjects } from '../redux/subjectSlice';
-import { logAction, clearLog } from '../redux/logSlice';
+import { submitAnswer } from '../redux/appSlice';
 
 import Data from '../assets/data.json';
 import { KEYS, CONFIG_PANEL_WIDTH } from '../shared/constants';
-import { useEffect } from 'react';
 
 const styles = {
     pageRoot: {
@@ -50,25 +48,22 @@ const getDownDownStartTimes = (reps, silenceBetweenReps) => {
 
 function ChooseClipPage() {
     const dispatch = useDispatch();
-    const selectedClip = useSelector((state) => state.app.selectedClip);
+    const selectedAnswer = useSelector((state) => state.app.selectedAnswer);
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
-    const repsPerTrainingClip = useSelector((state) => state.playback.repsPerTrainingClip);
-    const silenceBetweenReps = useSelector((state) => state.playback.silenceBetweenReps);
-    const testSubject = useSelector((state) => state.subject.testSubject);
-    const trainingSubjectA = useSelector((state) => state.subject.trainingSubjectA);
-    const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
+    const repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
+    const currentPage = useSelector((state) => state.app.currentPage);
+    const numberOfScreensInCurrentPhase = useSelector((state) => state.app.numberOfScreensInCurrentPhase);
+    const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
+    const currentTestSubjectName = useSelector((state) => state.app.currentTestSubjectName);
+    const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
     const [showPageBody, setShowPageBody] = React.useState(true);
     const [testClipListened, setTestClipListened] = React.useState(false);
 
     const handleSubmit = () => {
-        dispatch(clearSelectedClip());
-        dispatch(clearPlayingClip());
-        dispatch(clearTimeoutIDs());
-        dispatch(logAction(`Submit: ${['A', 'B'][selectedClip]}. \n---`));
-        dispatch(nextPage());
-        dispatch(randomizeSubjects());
-        dispatch(logAction(`New: A=${trainingSubjectA}, B=${trainingSubjectB}, Test=${testSubject}.`));
+        dispatch(
+            submitAnswer(currentTrainingSubjectNameList[selectedAnswer] === currentTestSubjectName ? 'True' : 'False')
+        );
 
         setTestClipListened(false);
 
@@ -82,16 +77,48 @@ function ChooseClipPage() {
             setShowPageBody(true);
         }, 500);
     };
-    useEffect(() => {
-        dispatch(clearLog());
-        dispatch(randomizeSubjects());
-        dispatch(logAction(`New: A=${trainingSubjectA}, B=${trainingSubjectB}, Test=${testSubject}.`));
-        // only want this to run the first time this page is loaded
-        // eslint-disable-next-line
-    }, [dispatch]);
+
+    const getTestClip = React.useCallback(
+        () => (
+            <SoundPlayerCard
+                downDownTimerStart={getDownDownStartTimes([Data[currentTestSubjectName][0]], 0)}
+                title={'Test Clip'}
+                clipIndex={-1}
+                selectable={false}
+            />
+        ),
+        // need to force a render when page turns
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [currentPage, currentTestSubjectName]
+    );
+
+    const getSubjectClip = React.useCallback(
+        (subjectName, subjectIndex) => (
+            <SoundPlayerCard
+                title={`Subject ${subjectIndex + 1}`}
+                clipIndex={subjectIndex}
+                downDownTimerStart={getDownDownStartTimes(
+                    Data[subjectName].slice(-repsPerTrainingClip),
+                    silenceBetweenReps
+                )}
+                disabled={!testClipListened}
+                selectable
+                key={subjectIndex}
+            />
+        ),
+        // need to force a render when page turns
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [currentPage, repsPerTrainingClip, silenceBetweenReps, testClipListened]
+    );
     return (
         <Box sx={[styles.pageRoot, isConfigPanelOpen && styles.pageRootConfigPanelOpen]}>
             <Stack direction={'column'} spacing={4} sx={{ width: 600, margin: '32px auto 0' }}>
+                <Breadcrumbs sx={{ alignItems: 'flex-end' }}>
+                    <Typography variant={'h4'}>{currentPage + 1}</Typography>
+                    <Typography variant={'h6'} color={'text.secondary'}>
+                        {numberOfScreensInCurrentPhase}
+                    </Typography>
+                </Breadcrumbs>
                 <Fade in={showPageBody}>
                     <Stack direction={'column'} spacing={4}>
                         <Box
@@ -99,37 +126,16 @@ function ChooseClipPage() {
                                 setTestClipListened(true);
                             }}
                         >
-                            <SoundPlayerCard
-                                title={'Test Clip'}
-                                isTestSubject
-                                downDownTimerStart={getDownDownStartTimes([Data[testSubject][0]], 0)}
-                            />
+                            {getTestClip()}
                         </Box>
                         <Stack direction={'column'} spacing={2}>
                             <Typography variant={'h4'}>Who typed the Test Clip?</Typography>
-                            <Typography variant={'Body1'}>
+                            <Typography variant={'body1'}>
                                 Listen to the two typing samples below, and make your best guess.
                             </Typography>
                         </Stack>
                         <Stack direction={'row'} spacing={2}>
-                            <SoundPlayerCard
-                                title={'Subject A'}
-                                clipIndex={0}
-                                downDownTimerStart={getDownDownStartTimes(
-                                    Data[trainingSubjectA].slice(-repsPerTrainingClip),
-                                    silenceBetweenReps
-                                )}
-                                disabled={!testClipListened}
-                            />
-                            <SoundPlayerCard
-                                title={'Subject B'}
-                                clipIndex={1}
-                                downDownTimerStart={getDownDownStartTimes(
-                                    Data[trainingSubjectB].slice(-repsPerTrainingClip),
-                                    silenceBetweenReps
-                                )}
-                                disabled={!testClipListened}
-                            />
+                            {currentTrainingSubjectNameList.map(getSubjectClip)}
                         </Stack>
                     </Stack>
                 </Fade>
@@ -138,7 +144,7 @@ function ChooseClipPage() {
                         variant={'contained'}
                         disableElevation
                         onClick={handleSubmit}
-                        disabled={selectedClip === -1 || !testClipListened}
+                        disabled={selectedAnswer === null || !testClipListened}
                         color={'secondary'}
                     >
                         Submit

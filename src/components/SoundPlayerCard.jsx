@@ -12,13 +12,11 @@ import Typography from '@mui/material/Typography';
 
 // Assets
 import { IS_KEY_PRESSED_HARD } from '../shared/constants';
-import { stopAllAudios } from '../shared/utils';
 import KeyStrokeHardSound from '../assets/keystroke-hard.mp3';
 import KeyStrokeLightSound from '../assets/keystroke-light.wav';
 
 // redux
-import { selectClip, addTimeoutID, clearTimeoutIDs, clearPlayingClip, setPlayingClip } from '../redux/appSlice';
-import { logAction } from '../redux/logSlice';
+import { setPlayingClip, clearAllAudios, addTimeoutID, logAction, selectAnswer } from '../redux/appSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const cardHovered = {
@@ -38,6 +36,7 @@ const cardContentStyle = {
     },
 };
 
+// update progress bar every 200ms
 const progressUpdatePeriod = 200;
 
 const progressZero = {
@@ -56,31 +55,45 @@ const actionHovered = {
     color: 'primary.dark',
 };
 
+/**
+ * Sound player for keystrokes.
+ * @param {number[]} downDownTimerStart - starting time for each keystroke, calculated using "DD.x" value
+ * @param {string} title - string to be displayed on the card and logged for the experimenter
+ * @param {number} clipIndex - a unique identifier for the clip
+ * @param {boolean} selectable - when false, there will not be a "select" button on the bottom
+ * @param {boolean} disabled - when disabled, the select button will still be rendered but will be disabled
+ * @returns JSX.Element
+ */
 const SoundPlayerCard = (props) => {
-    const { downDownTimerStart, title, clipIndex = -1, isTestSubject = false, disabled = false } = props;
+    const {
+        downDownTimerStart,
+        title,
+        clipIndex,
+        selectable = false,
+        disableSelectButton = false,
+        ...otherProps
+    } = props;
     const [isHovered, setIsHovered] = React.useState(false);
     const [playingTimer, setPlayingTimer] = React.useState(null);
     const [progress, setProgress] = React.useState(null);
     const dispatch = useDispatch();
-    const isSelected = useSelector((state) => state.app.selectedClip) === clipIndex && !isTestSubject;
-    const isPlaying = useSelector((state) => state.app.playingClip) === (isTestSubject ? -1 : clipIndex);
-    const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
+    const isSelected = useSelector((state) => state.app.selectedAnswer) === clipIndex && selectable;
+    const isPlaying = useSelector((state) => state.app.playingClipIndex) === clipIndex;
+    const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
+    const currentPage = useSelector((state) => state.app.currentPage);
 
     const playDuration = React.useMemo(
         () => downDownTimerStart[downDownTimerStart.length - 1] / playbackSpeed + 500,
         [downDownTimerStart, playbackSpeed]
     );
-    const clipName = React.useMemo(() => (isTestSubject ? 'Test' : ['A', 'B'][clipIndex]), [isTestSubject, clipIndex]);
 
     const handlePlay = React.useCallback(() => {
         console.log('handlePlay');
         if (isPlaying) {
             return;
         }
-        stopAllAudios();
-        dispatch(clearTimeoutIDs());
-        dispatch(setPlayingClip(isTestSubject ? -1 : clipIndex));
-        dispatch(logAction(`Play: ${clipName}`));
+        dispatch(setPlayingClip(clipIndex));
+        dispatch(logAction(`Play: ${clipIndex} (${title})`));
         setProgress(0);
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
@@ -114,22 +127,19 @@ const SoundPlayerCard = (props) => {
             });
         }, progressUpdatePeriod);
         dispatch(addTimeoutID(progressTimeoutID));
-        setPlayingTimer(
-            setTimeout(() => {
-                dispatch(clearTimeoutIDs());
-                dispatch(clearPlayingClip());
-                setProgress(null);
-                clearInterval(progressTimeoutID);
-            }, playDuration)
-        );
-    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, isTestSubject, clipIndex, clipName]);
+        const playingTimeout = setTimeout(() => {
+            dispatch(clearAllAudios());
+            setProgress(null);
+            clearInterval(progressTimeoutID);
+        }, playDuration);
+        setPlayingTimer(playingTimeout);
+        dispatch(addTimeoutID(playingTimeout));
+    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, clipIndex, title]);
 
     const handleStop = React.useCallback(() => {
         console.log('handleStop');
-        stopAllAudios();
-        dispatch(clearTimeoutIDs());
-        dispatch(clearPlayingClip());
-        setProgress(0);
+        dispatch(clearAllAudios());
+        setProgress(null);
         if (playingTimer !== null) {
             clearTimeout(playingTimer);
         }
@@ -143,10 +153,15 @@ const SoundPlayerCard = (props) => {
         };
     }, [playingTimer]);
 
+    React.useEffect(() => {
+        setProgress(null);
+    }, [currentPage]);
+
     return (
         <Card
             variant={'outlined'}
             sx={[{ flex: 1 }, isHovered && !isSelected && cardHovered, isSelected && cardSelected]}
+            {...otherProps}
         >
             <CardContent
                 onClick={isPlaying ? handleStop : handlePlay}
@@ -170,7 +185,7 @@ const SoundPlayerCard = (props) => {
                 </Box>
                 {isPlaying && progress !== null && <Box sx={progressZero} style={{ width: `${progress}%` }} />}
             </CardContent>
-            {!isTestSubject && (
+            {selectable && (
                 <>
                     <Divider />
                     <CardActions
@@ -178,16 +193,18 @@ const SoundPlayerCard = (props) => {
                         onMouseLeave={() => setIsHovered(false)}
                         sx={{ '&:hover': actionHovered }}
                         onClick={() => {
-                            if (disabled) {
+                            if (disableSelectButton) {
                                 return;
                             }
-                            dispatch(selectClip(clipIndex));
-                            dispatch(logAction(`Select: ${clipName}`));
+                            dispatch(selectAnswer(clipIndex));
+                            dispatch(logAction(`Select: ${title}`));
                         }}
                     >
                         <Typography
                             variant={'button'}
-                            color={disabled ? 'text.disabled' : isSelected ? 'secondary.main' : 'primary.main'}
+                            color={
+                                disableSelectButton ? 'text.disabled' : isSelected ? 'secondary.main' : 'primary.main'
+                            }
                         >
                             {isSelected ? 'Selected' : 'Select'}
                         </Typography>

@@ -15,19 +15,17 @@ import CloseIcon from '@mui/icons-material/Close';
 
 // redux
 import { useSelector, useDispatch } from 'react-redux';
-import { closeConfigPanel, clearPlayingClip, clearTimeoutIDs, toggleFABVisibility } from '../redux/appSlice';
 import {
-    changeTrainingSubjectA,
-    changeTrainingSubjectB,
-    changeTestSubject,
-    randomizeSubjects,
-} from '../redux/subjectSlice';
-import { clearLog } from '../redux/logSlice';
-import {
-    setSilenceBetweenReps as _setSilenceBetweenReps,
+    changeCurrentTrainingSubjectName,
+    closeConfigPanel,
+    toggleFABVisibility,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
+    setSilenceBetweenReps as _setSilenceBetweenReps,
+    clearAllAudios,
+    changeCurrentTestSubjectName,
     setPlaybackSpeed,
-} from '../redux/playbackSlice';
+    setPreset,
+} from '../redux/appSlice';
 
 import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps, download } from '../shared/utils';
 import { CONFIG_PANEL_WIDTH } from '../shared/constants';
@@ -52,14 +50,15 @@ const ConfigPanel = () => {
     const dispatch = useDispatch();
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
     const invisibleFAB = useSelector((state) => state.app.invisibleFAB);
-    const testSubject = useSelector((state) => state.subject.testSubject);
-    const trainingSubjectA = useSelector((state) => state.subject.trainingSubjectA);
-    const trainingSubjectB = useSelector((state) => state.subject.trainingSubjectB);
-    const _repsPerTrainingClip = useSelector((state) => state.playback.repsPerTrainingClip);
-    const _silenceBetweenReps = useSelector((state) => state.playback.silenceBetweenReps);
-    const playbackSpeed = useSelector((state) => state.playback.playbackSpeed);
-    const logText = useSelector((state) => state.log.logText);
+    const currentTestSubjectName = useSelector((state) => state.app.currentTestSubjectName);
+    const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
+    const _repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
+    const _silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
+    const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
+    const logText = useSelector((state) => state.app.logText);
+    const preset = useSelector((state) => state.app.preset);
 
+    // store value locally with "useState", and submit value on blur
     const [repsPerTrainingClip, setRepsPerTrainingClip] = React.useState(_repsPerTrainingClip);
     const [silenceBetweenReps, setSilenceBetweenReps] = React.useState(_silenceBetweenReps);
 
@@ -68,12 +67,13 @@ const ConfigPanel = () => {
     }, [dispatch]);
 
     const handleDownload = React.useCallback(() => {
-        dispatch(clearPlayingClip());
-        dispatch(clearTimeoutIDs());
+        dispatch(clearAllAudios());
         download('data.log', logText);
-        dispatch(clearLog());
-        dispatch(randomizeSubjects());
     }, [dispatch, logText]);
+
+    const isTestSubjectInTrainingSubjects = React.useMemo(() => {
+        return currentTrainingSubjectNameList.includes(currentTestSubjectName);
+    }, [currentTrainingSubjectNameList, currentTestSubjectName]);
 
     return (
         <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
@@ -88,56 +88,65 @@ const ConfigPanel = () => {
                     <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
                 </Box>
                 <Stack spacing={4} margin={2} marginTop={4} divider={<Divider flexItem />}>
-                    {/* Text Clip */}
                     <FormControl>
-                        <InputLabel
-                            id="test-subject"
-                            error={![trainingSubjectA, trainingSubjectB].includes(testSubject)}
-                        >
-                            Test Clip
-                        </InputLabel>
+                        <InputLabel id="preset">Preset</InputLabel>
                         <Select
-                            labelId="test-subject"
-                            value={[trainingSubjectA, trainingSubjectB].includes(testSubject) ? testSubject : ''}
-                            label="Test Clip"
+                            labelId="preset"
+                            value={preset === null ? 'Random' : preset}
+                            label="Preset"
                             onChange={(event) => {
-                                dispatch(changeTestSubject(event.target.value));
+                                dispatch(setPreset(event.target.value));
                             }}
-                            error={![trainingSubjectA, trainingSubjectB].includes(testSubject)}
                         >
-                            <MenuItem value={trainingSubjectA}>{trainingSubjectA}</MenuItem>
-                            <MenuItem value={trainingSubjectB}>{trainingSubjectB}</MenuItem>
+                            <MenuItem value={'Random'}>Random</MenuItem>
+                            <Divider />
+                            <MenuItem value={'Preset A'}>Preset A</MenuItem>
                         </Select>
                     </FormControl>
-                    {/* Subjects */}
+                    {/* Test Clip */}
                     <Stack direction={'column'} spacing={3}>
+                        <FormControl>
+                            <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
+                                Test Clip
+                            </InputLabel>
+                            <Select
+                                labelId="test-subject"
+                                value={isTestSubjectInTrainingSubjects ? currentTestSubjectName : ''}
+                                label="Test Clip"
+                                onChange={(event) => {
+                                    dispatch(changeCurrentTestSubjectName(event.target.value));
+                                }}
+                                error={!isTestSubjectInTrainingSubjects}
+                            >
+                                {currentTrainingSubjectNameList.map((trainingSubjectName, trainingSubjectIndex) => (
+                                    <MenuItem value={trainingSubjectName} key={trainingSubjectIndex}>
+                                        {trainingSubjectName}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        {/* Subjects */}
                         <Stack direction={'row'} spacing={2}>
-                            <FormControl fullWidth>
-                                <InputLabel id="training-subject-a">Subject A</InputLabel>
-                                <Select
-                                    labelId="training-subject-a"
-                                    value={trainingSubjectA}
-                                    label="Subject A"
-                                    onChange={(event) => {
-                                        dispatch(changeTrainingSubjectA(event.target.value));
-                                    }}
-                                >
-                                    {getSubjectSelectMenuItem()}
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth>
-                                <InputLabel id="training-subject-b">Subject B</InputLabel>
-                                <Select
-                                    labelId="training-subject-b"
-                                    value={trainingSubjectB}
-                                    label="Subject B"
-                                    onChange={(event) => {
-                                        dispatch(changeTrainingSubjectB(event.target.value));
-                                    }}
-                                >
-                                    {getSubjectSelectMenuItem()}
-                                </Select>
-                            </FormControl>
+                            {currentTrainingSubjectNameList.map((subjectName, subjectIndex) => (
+                                <FormControl fullWidth key={subjectIndex}>
+                                    <InputLabel id="training-subject-a">Subject {subjectIndex + 1}</InputLabel>
+                                    <Select
+                                        labelId="training-subject-a"
+                                        value={subjectName}
+                                        label={`Subject ${subjectIndex + 1}`}
+                                        onChange={(event) => {
+                                            dispatch(
+                                                changeCurrentTrainingSubjectName({
+                                                    name: event.target.value,
+                                                    index: subjectIndex,
+                                                })
+                                            );
+                                        }}
+                                    >
+                                        {getSubjectSelectMenuItem()}
+                                    </Select>
+                                </FormControl>
+                            ))}
                         </Stack>
                         <TextField
                             label="Reps for Each Subject Clip"

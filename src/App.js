@@ -1,16 +1,18 @@
+import * as React from 'react';
+
 import Fab from './components/Fab';
 import ConfigPanel from './components/ConfigPanel';
-import { getPage } from './pages';
+import { PAGES } from './pages';
 import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 
 function App() {
-    const currentPage = useSelector((state) => state.app.currentPage);
+    const currentStage = useSelector((state) => state.app.currentStage);
     return (
         <Box id={'root-box'}>
             <ConfigPanel />
             <Fab />
-            {getPage(currentPage)}
+            {PAGES[currentStage]}
         </Box>
     );
 }

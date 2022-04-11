@@ -27,6 +27,10 @@ export const randomItemsFromArray = (array, n) => {
     return array.sort(() => 0.5 - Math.random()).slice(0, n);
 };
 
+export const getRandomInt = (n) => {
+    return Math.floor(n * Math.random());
+};
+
 export const download = (filename, text) => {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
