@@ -9,6 +9,7 @@ import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/materia
 
 import { useSelector, useDispatch } from 'react-redux';
 import { setPreset, setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
+import useQueryString from '../hooks/useQueryString';
 
 const wrapperStyle = {
     flexDirection: 'column',
@@ -20,6 +21,7 @@ const wrapperStyle = {
 
 function ExperimentSetUp() {
     const dispatch = useDispatch();
+    const parameters = useQueryString();
     const preset = useSelector((state) => state.app.preset);
     const [participantIDEntered, setParticipantIDEntered] = React.useState(false);
     const participantID = useSelector((state) => state.app.participantID);
