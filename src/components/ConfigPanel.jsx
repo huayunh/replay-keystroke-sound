@@ -57,6 +57,8 @@ const ConfigPanel = () => {
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const logText = useSelector((state) => state.app.logText);
     const preset = useSelector((state) => state.app.preset);
+    const participantID = useSelector((state) => state.app.participantID);
+    const experimentType = useSelector((state) => state.app.experimentType);
 
     // store value locally with "useState", and submit value on blur
     const [repsPerTrainingClip, setRepsPerTrainingClip] = React.useState(_repsPerTrainingClip);
@@ -68,8 +70,8 @@ const ConfigPanel = () => {
 
     const handleDownload = React.useCallback(() => {
         dispatch(clearAllAudios());
-        download('data.log', logText);
-    }, [dispatch, logText]);
+        download(`${participantID}.log`, logText);
+    }, [dispatch, logText, participantID]);
 
     const isTestSubjectInTrainingSubjects = React.useMemo(() => {
         return currentTrainingSubjectNameList.includes(currentTestSubjectName);
@@ -104,29 +106,32 @@ const ConfigPanel = () => {
                                 <Divider />
                                 <MenuItem value={'Preset A'}>Preset A</MenuItem>
                                 <MenuItem value={'Preset B'}>Preset B</MenuItem>
+                                <MenuItem value={'Preset C'}>Preset C</MenuItem>
                             </Select>
                         </FormControl>
                         {/* Test Clip */}
-                        <FormControl disabled={preset !== 'Random'}>
-                            <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
-                                Test Clip
-                            </InputLabel>
-                            <Select
-                                labelId="test-subject"
-                                value={isTestSubjectInTrainingSubjects ? currentTestSubjectName : ''}
-                                label="Test Clip"
-                                onChange={(event) => {
-                                    dispatch(changeCurrentTestSubjectName(event.target.value));
-                                }}
-                                error={!isTestSubjectInTrainingSubjects}
-                            >
-                                {currentTrainingSubjectNameList.map((trainingSubjectName, trainingSubjectIndex) => (
-                                    <MenuItem value={trainingSubjectName} key={trainingSubjectIndex}>
-                                        {trainingSubjectName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {experimentType !== 'areTheyTheSame' && (
+                            <FormControl disabled={preset !== 'Random'}>
+                                <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
+                                    Test Clip
+                                </InputLabel>
+                                <Select
+                                    labelId="test-subject"
+                                    value={isTestSubjectInTrainingSubjects ? currentTestSubjectName : ''}
+                                    label="Test Clip"
+                                    onChange={(event) => {
+                                        dispatch(changeCurrentTestSubjectName(event.target.value));
+                                    }}
+                                    error={!isTestSubjectInTrainingSubjects}
+                                >
+                                    {currentTrainingSubjectNameList.map((trainingSubjectName, trainingSubjectIndex) => (
+                                        <MenuItem value={trainingSubjectName} key={trainingSubjectIndex}>
+                                            {trainingSubjectName}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
                         {/* Subjects */}
                         <Stack direction={'row'} spacing={2}>
                             {currentTrainingSubjectNameList.map((subjectName, subjectIndex) => (

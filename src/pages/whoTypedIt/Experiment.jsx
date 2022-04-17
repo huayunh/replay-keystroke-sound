@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import SoundPlayerCard from '../components/SoundPlayerCard';
+import SoundPlayerCard from '../../components/SoundPlayerCard';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -11,10 +11,11 @@ import DoneIcon from '@mui/icons-material/Done';
 
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import { submitAnswer } from '../redux/appSlice';
+import { submitAnswer } from '../../redux/appSlice';
 
-import Data from '../assets/data.json';
-import { KEYS, CONFIG_PANEL_WIDTH } from '../shared/constants';
+import Data from '../../assets/data.json';
+import { CONFIG_PANEL_WIDTH } from '../../shared/constants';
+import { getDownDownStartTimes } from '../../shared/utils';
 
 const styles = {
     pageRoot: {
@@ -28,25 +29,7 @@ const styles = {
     },
 };
 
-const getDownDownStartTimes = (reps, silenceBetweenReps) => {
-    const downDownTimerStart = [];
-    reps.forEach((rep, repIndex) => {
-        const newRepStart = downDownTimerStart.length;
-        if (repIndex !== 0) {
-            downDownTimerStart[newRepStart] = downDownTimerStart[newRepStart - 1] + silenceBetweenReps;
-        } else {
-            downDownTimerStart[0] = 0;
-        }
-        for (let i = 1; i < KEYS.length; i++) {
-            downDownTimerStart[newRepStart + i] =
-                downDownTimerStart[newRepStart + i - 1] +
-                Math.round(parseFloat(rep[`DD.${KEYS[i - 1]}.${KEYS[i]}`]) * 1000);
-        }
-    });
-    return downDownTimerStart;
-};
-
-function ChooseClipPage() {
+function ExperimentPage() {
     const dispatch = useDispatch();
     const selectedAnswer = useSelector((state) => state.app.selectedAnswer);
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
@@ -161,4 +144,4 @@ function ChooseClipPage() {
     );
 }
 
-export default ChooseClipPage;
+export default ExperimentPage;

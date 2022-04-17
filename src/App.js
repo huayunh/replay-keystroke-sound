@@ -8,11 +8,21 @@ import { useSelector } from 'react-redux';
 
 function App() {
     const currentStage = useSelector((state) => state.app.currentStage);
+    const experimentType = useSelector((state) => state.app.experimentType);
+
+    const getPageBody = React.useCallback(() => {
+        const currStagePage = PAGES[currentStage];
+        if (['welcome', 'experiment'].includes(currentStage)) {
+            return currStagePage[experimentType];
+        } else {
+            return currStagePage;
+        }
+    }, [currentStage, experimentType]);
     return (
         <Box id={'root-box'}>
             <ConfigPanel />
             <Fab />
-            {PAGES[currentStage]}
+            {getPageBody()}
         </Box>
     );
 }

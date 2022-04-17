@@ -1,4 +1,5 @@
 import Data from '../assets/data.json';
+import { KEYS } from './constants';
 const firstSubject = Data.subjects[0];
 
 export const rangeValue = (oldVal, _newVal, minVal, maxVal = Infinity) => {
@@ -39,4 +40,22 @@ export const download = (filename, text) => {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+};
+
+export const getDownDownStartTimes = (reps, silenceBetweenReps) => {
+    const downDownTimerStart = [];
+    reps.forEach((rep, repIndex) => {
+        const newRepStart = downDownTimerStart.length;
+        if (repIndex !== 0) {
+            downDownTimerStart[newRepStart] = downDownTimerStart[newRepStart - 1] + silenceBetweenReps;
+        } else {
+            downDownTimerStart[0] = 0;
+        }
+        for (let i = 1; i < KEYS.length; i++) {
+            downDownTimerStart[newRepStart + i] =
+                downDownTimerStart[newRepStart + i - 1] +
+                Math.round(parseFloat(rep[`DD.${KEYS[i - 1]}.${KEYS[i]}`]) * 1000);
+        }
+    });
+    return downDownTimerStart;
 };

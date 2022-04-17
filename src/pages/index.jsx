@@ -1,9 +1,13 @@
-import ChooseClipPage from './ChooseClipPage';
+import ExperimentSetUp from './ExperimentSetUp';
 import EndPage from './EndPage';
-import WelcomePage from './WelcomePage';
+import WelcomePageAreTheyTheSame from './areTheyTheSame/WelcomePage';
+import WelcomePageWhoTypedIt from './whoTypedIt/WelcomePage';
+import ExperimentAreTheyTheSame from './areTheyTheSame/Experiment';
+import ExperimentWhoTypedIt from './whoTypedIt/Experiment';
 
 export const PAGES = {
-    welcome: <WelcomePage />,
-    experiment: <ChooseClipPage />,
+    setup: <ExperimentSetUp />,
+    welcome: { areTheyTheSame: <WelcomePageAreTheyTheSame />, whoTypedIt: <WelcomePageWhoTypedIt /> },
+    experiment: { areTheyTheSame: <ExperimentAreTheyTheSame />, whoTypedIt: <ExperimentWhoTypedIt /> },
     end: <EndPage />,
 };

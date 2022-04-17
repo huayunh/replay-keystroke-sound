@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { PRESET_A, PRESET_B } from '../shared/constants';
+import { PRESET_A, PRESET_B, PRESET_C } from '../shared/constants';
 import {
     getRandomInt,
     randomItemsFromArray,
@@ -15,6 +15,8 @@ const initSubjects = (state) => {
         state.subjectSequence = PRESET_A.slice();
     } else if (state.preset === 'Preset B') {
         state.subjectSequence = PRESET_B.slice();
+    } else if (state.preset === 'Preset C') {
+        state.subjectSequence = PRESET_C.slice();
     } else {
         // by default, choose 5 pairs of subjects by random
         const pairsOfSubject = 5;
@@ -78,7 +80,7 @@ export const appSlice = createSlice({
         invisibleFAB: true,
         currentPage: 0,
         numberOfPagesInCurrentStage: 1,
-        currentStage: 'welcome', // 'welcome' || 'experiment' || 'end'
+        currentStage: 'setup', // 'setup' | 'welcome' | 'experiment' | 'end'
 
         // Logs
         logText: '',
@@ -86,8 +88,12 @@ export const appSlice = createSlice({
         numberOfCorrectAnswers: 0,
         numberOfIncorrectAnswers: 0,
 
+        // Experiment record
+        participantID: null,
+        experimentType: null, // null | 'areTheyTheSame' | 'whoTypedIt'
+
         // play controls
-        repsPerTrainingClip: 3, // between 1 and (<number of reps in data.json> - 1)
+        repsPerTrainingClip: 1, // between 1 and (<number of reps in data.json> - 1)
         silenceBetweenReps: 1500, // in milisecond
         playbackSpeed: 1.0,
         playingClipIndex: null, // test = -1, first clip = 0, second clip = 1
@@ -98,7 +104,7 @@ export const appSlice = createSlice({
         currentTrainingSubjectNameList: [],
         currentTestSubjectIndex: null, // index in the name list parameter above
         currentTestSubjectName: null,
-        preset: 'Random', // 'Random' | 'Preset A' | 'Preset B'
+        preset: 'Preset A', // 'Random' | 'Preset A' | 'Preset B' | 'Preset C'
     },
     reducers: {
         /*
@@ -127,7 +133,7 @@ export const appSlice = createSlice({
             logText(state, `Select: ${state.selectedAnswer} (${action.payload.text})`);
         },
         clearSelectedAnswer: (state) => {
-            state.selectedAnswer = -1;
+            state.selectedAnswer = null;
         },
 
         /*
@@ -159,6 +165,14 @@ export const appSlice = createSlice({
         },
         clearAllAudios: (state) => {
             muteAllSounds(state);
+        },
+
+        /*
+         * Experiment control
+         */
+
+        setParticipantID: (state, action) => {
+            state.participantID = action.payload;
         },
 
         /*
@@ -201,6 +215,13 @@ export const appSlice = createSlice({
          */
         startExperiment: (state) => {
             initSubjects(state);
+        },
+        setUpScreenOnStart: (state, action) => {
+            logText(state, `Start Experiment: ${action.payload}`);
+            state.experimentType = action.payload;
+            state.currentStage = 'welcome';
+            state.currentPage = 0;
+            state.numberOfPagesInCurrentStage = 1;
         },
         welcomeScreenOnStart: (state) => {
             state.currentStage = 'experiment';
@@ -253,11 +274,13 @@ export const {
     addTimeoutID,
     setPlayingClip,
     clearAllAudios,
+    setParticipantID,
     changeCurrentTestSubjectName,
     changeCurrentTrainingSubjectName,
     setPreset,
     clearPreset,
     startExperiment,
+    setUpScreenOnStart,
     welcomeScreenOnStart,
     submitAnswer,
 } = appSlice.actions;
