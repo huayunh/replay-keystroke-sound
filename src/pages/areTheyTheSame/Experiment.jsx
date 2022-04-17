@@ -35,6 +35,14 @@ const sliderStyle = {
         height: 16,
         width: 16,
     },
+    '& .MuiSlider-mark': {
+        width: 4,
+        height: 4,
+    },
+    '&:hover .MuiSlider-rail': {
+        height: 8,
+        transition: (theme) => theme.transitions.create('height', { duration: theme.transitions.duration.shortest }),
+    },
 };
 const sliderThumbHiddenStyle = {
     '& .MuiSlider-thumb': {

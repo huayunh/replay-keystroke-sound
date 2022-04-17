@@ -22,6 +22,8 @@ const DownloadButton = () => {
     const subjectSequence = useSelector((state) => state.app.subjectSequence);
     const answerSequence = useSelector((state) => state.app.answerSequence);
     const answerIndexSequence = useSelector((state) => state.app.answerIndexSequence);
+    const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
+
     const handleDownload = () => {
         dispatch(clearAllAudios());
         const correctCount = answerSequence.filter((ans) => ans === 'Correct').length;
@@ -35,6 +37,7 @@ Sequence,${subjectSequence.map((subjectPair) => subjectPair.join('-')).join(',')
 CorrectAnswers,${correctCount}
 IncorrectAnswers,${answerSequence.length - correctCount}
 Playback Speed,${playbackSpeed}
+Is Progress Bar Visible,${isProgressBarVisible}
 `;
         if (experimentType === 'whoTypedIt') {
             summary += `Repitions for Each Subject Clip,${repsPerTrainingClip}
@@ -44,7 +47,7 @@ Silence between Repitions (ms),${silenceBetweenReps}
         summary += `========================
 Answers to Each Question
 ========================
-Question No.,Raw Data,Question Answered Correctly?
+Question No.,${experimentType === 'areTheyTheSame' ? 'Confidence Level' : 'Raw Data'},Question Answered Correctly?
 `;
         for (let i = 0; i < answerSequence.length; i++) {
             summary += `${i + 1},${answerIndexSequence[i]},${answerSequence[i]}\n`;

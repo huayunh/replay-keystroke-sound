@@ -11,12 +11,12 @@ const fabStyle = {
 
 const Fab = () => {
     const dispatch = useDispatch();
-    const invisibleFAB = useSelector((state) => state.app.invisibleFAB);
+    const isFABVisible = useSelector((state) => state.app.isFABVisible);
     const handleClick = () => {
         dispatch(openConfigPanel());
     };
     return (
-        <MuiFab sx={[fabStyle, invisibleFAB && { opacity: 0 }]} aria-label="settings" onClick={handleClick}>
+        <MuiFab sx={[fabStyle, !isFABVisible && { opacity: 0 }]} aria-label="settings" onClick={handleClick}>
             <EditIcon />
         </MuiFab>
     );

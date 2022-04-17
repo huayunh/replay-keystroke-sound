@@ -8,8 +8,6 @@ import {
 } from '../shared/utils';
 import Data from '../assets/data.json';
 
-// this function will be called by redux before welcome screen loads and
-// when the user triggers a preset before the app enters the experiment stage
 const initSubjects = (state) => {
     if (state.preset === 'Preset A') {
         state.subjectSequence = PRESET_A.slice();
@@ -50,9 +48,11 @@ const muteAllSounds = (state) => {
     }
 };
 
-const logText = (state, action, rawData = '', explanation = '') => {
+const logText = (state, action, parameter = '', rawData = '', explanation = '') => {
     const currentTime = new Date().getTime();
-    state.logText += `${((currentTime - state.timestamp) / 1000).toFixed(3)},${action},${rawData},${explanation}\n`;
+    state.logText += `${((currentTime - state.timestamp) / 1000).toFixed(
+        3
+    )},${action},${parameter},${rawData},${explanation}\n`;
     state.timestamp = currentTime;
 };
 
@@ -61,6 +61,7 @@ const logNewQuestion = (state) => {
         logText(
             state,
             'New Question',
+            'Current Question',
             state.currentPage + 1,
             `Clips: ${state.currentTrainingSubjectNameList.join('-')}`
         );
@@ -68,6 +69,7 @@ const logNewQuestion = (state) => {
         logText(
             state,
             'New Question',
+            'Current Question',
             state.currentPage + 1,
             `Test Clip: ${state.currentTestSubjectName}; Subjects: ${state.currentTrainingSubjectNameList.join('-')}`
         );
@@ -80,7 +82,8 @@ export const appSlice = createSlice({
         // UI controls
         isConfigPanelOpen: false,
         selectedAnswer: null,
-        invisibleFAB: true,
+        isFABVisible: false,
+        isProgressBarVisible: true,
         currentPage: 0,
         numberOfPagesInCurrentStage: 1,
         currentStage: 'setup', // 'setup' | 'welcome' | 'experiment' | 'end'
@@ -114,17 +117,20 @@ export const appSlice = createSlice({
          */
         openConfigPanel: (state) => {
             state.isConfigPanelOpen = true;
-            logText(state, 'Config Panel', 'Open', 'Config panel open');
+            logText(state, 'Config Panel', '- -', 'Open', 'Config panel open');
         },
         closeConfigPanel: (state) => {
             state.isConfigPanelOpen = false;
-            logText(state, 'Config Panel', 'Closed', 'Config panel closed');
+            logText(state, 'Config Panel', '- -', 'Closed', 'Config panel closed');
         },
         nextPage: (state) => {
             state.currentPage += 1;
         },
         toggleFABVisibility: (state) => {
-            state.invisibleFAB = !state.invisibleFAB;
+            state.isFABVisible = !state.isFABVisible;
+        },
+        toggleProgressBarVisibility: (state) => {
+            state.isProgressBarVisible = !state.isProgressBarVisible;
         },
 
         /*
@@ -132,7 +138,7 @@ export const appSlice = createSlice({
          */
         selectAnswer: (state, action) => {
             state.selectedAnswer = action.payload.index;
-            logText(state, 'Select', state.selectedAnswer, action.payload.text);
+            logText(state, 'Select', 'Selected Answer', state.selectedAnswer, action.payload.text);
         },
         clearSelectedAnswer: (state) => {
             state.selectedAnswer = null;
@@ -142,7 +148,13 @@ export const appSlice = createSlice({
          * logs
          */
         logAction: (state, action) => {
-            logText(state, action.payload.action, action.payload.rawData, action.payload.explanation);
+            logText(
+                state,
+                action.payload.action,
+                action.payload.parameter,
+                action.payload.rawData,
+                action.payload.explanation
+            );
         },
 
         /*
@@ -232,7 +244,7 @@ export const appSlice = createSlice({
             muteAllSounds(state);
 
             // log users' answer and update UI
-            logText(state, 'Submit', state.selectedAnswer, action.payload);
+            logText(state, 'Submit', 'Selected Answer', state.selectedAnswer, action.payload);
             state.answerSequence.push(action.payload);
             state.answerIndexSequence.push(state.selectedAnswer);
             state.currentPage += 1;
@@ -260,6 +272,7 @@ export const {
     closeConfigPanel,
     nextPage,
     toggleFABVisibility,
+    toggleProgressBarVisibility,
     selectAnswer,
     clearSelectedAnswer,
     logAction,

@@ -20,6 +20,7 @@ import {
     changeCurrentTrainingSubjectName,
     closeConfigPanel,
     toggleFABVisibility,
+    toggleProgressBarVisibility,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
     setSilenceBetweenReps as _setSilenceBetweenReps,
     changeCurrentTestSubjectName,
@@ -49,7 +50,7 @@ const getSubjectSelectMenuItem = () => {
 const ConfigPanel = () => {
     const dispatch = useDispatch();
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
-    const invisibleFAB = useSelector((state) => state.app.invisibleFAB);
+    const isFABVisible = useSelector((state) => state.app.isFABVisible);
     const currentTestSubjectName = useSelector((state) => state.app.currentTestSubjectName);
     const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
     const _repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
@@ -57,6 +58,7 @@ const ConfigPanel = () => {
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const preset = useSelector((state) => state.app.preset);
     const experimentType = useSelector((state) => state.app.experimentType);
+    const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
 
     // store value locally with "useState", and submit value on blur
     const [repsPerTrainingClip, setRepsPerTrainingClip] = React.useState(_repsPerTrainingClip);
@@ -78,7 +80,7 @@ const ConfigPanel = () => {
                         <IconButton onClick={handleClickCloseIcon} edge={'start'}>
                             <CloseIcon />
                         </IconButton>
-                        <Typography variant={'h5'}>Settings</Typography>
+                        <Typography variant={'h6'}>Config Panel</Typography>
                     </Stack>
                     <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
                 </Box>
@@ -204,13 +206,24 @@ const ConfigPanel = () => {
                         <FormControlLabel
                             control={
                                 <Switch
-                                    checked={invisibleFAB}
+                                    checked={isFABVisible}
                                     onChange={() => {
                                         dispatch(toggleFABVisibility());
                                     }}
                                 />
                             }
-                            label="Hide Config Panel Button"
+                            label="Config Panel Button Visible"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={isProgressBarVisible}
+                                    onChange={() => {
+                                        dispatch(toggleProgressBarVisibility());
+                                    }}
+                                />
+                            }
+                            label="Progress Bar Visible"
                         />
                     </Stack>
                 </Stack>

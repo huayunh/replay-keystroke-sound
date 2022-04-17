@@ -83,6 +83,7 @@ const SoundPlayerCard = (props) => {
     const isPlaying = useSelector((state) => state.app.playingClipIndex) === clipIndex;
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const currentPage = useSelector((state) => state.app.currentPage);
+    const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
 
     const playDuration = React.useMemo(
         () => downDownTimerStart[downDownTimerStart.length - 1] / playbackSpeed + 500,
@@ -97,6 +98,7 @@ const SoundPlayerCard = (props) => {
         dispatch(
             logAction({
                 action: 'Play',
+                parameter: 'clipIndex',
                 rawData: clipIndex,
                 explanation: `The clip titled "${title}"${secretIdentifier ? `(${secretIdentifier})` : ''} is played`,
             })
@@ -189,7 +191,9 @@ const SoundPlayerCard = (props) => {
                         {title}
                     </Typography>
                 </Box>
-                {isPlaying && progress !== null && <Box sx={progressZero} style={{ width: `${progress}%` }} />}
+                {isPlaying && isProgressBarVisible && progress !== null && (
+                    <Box sx={progressZero} style={{ width: `${progress}%` }} />
+                )}
             </CardContent>
             {selectable && (
                 <>
