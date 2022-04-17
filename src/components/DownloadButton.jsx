@@ -41,7 +41,7 @@ Playback Speed,${playbackSpeed}
 Silence between Repitions (ms),${silenceBetweenReps}
 `;
         }
-        summary += ` ========================
+        summary += `========================
 Answers to Each Question
 ========================
 Question No.,Raw Data,Question Answered Correctly?
