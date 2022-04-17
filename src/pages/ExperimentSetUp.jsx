@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { startExperiment, setPreset, setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
+import { setPreset, setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
 
 const wrapperStyle = {
     flexDirection: 'column',
@@ -24,15 +24,9 @@ function ExperimentSetUp() {
     const [participantIDEntered, setParticipantIDEntered] = React.useState(false);
     const participantID = useSelector((state) => state.app.participantID);
 
-    React.useEffect(() => {
-        dispatch(startExperiment());
-        // we want this to be run only once when the experiment start
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     return (
         <Box>
-            <Stack spacing={2} sx={wrapperStyle}>
+            <Stack spacing={4} sx={wrapperStyle}>
                 <Typography variant={'h4'}>Set Up the Experiment</Typography>
                 <Stack direction={'row'} divider={<Divider orientation={'vertical'} flexItem />} spacing={4}>
                     <Stack spacing={3}>

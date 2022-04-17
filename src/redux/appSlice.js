@@ -34,13 +34,7 @@ const initSubjects = (state) => {
     state.currentTestSubjectName = state.currentTrainingSubjectNameList[state.currentTestSubjectIndex];
 
     const currentTime = new Date().getTime();
-    state.logText += `New session begins.\n`;
-    state.logText += `Current time: ${new Date(state.timestamp).toString()}\n`;
-    state.logText += `[+${(currentTime - state.timestamp) / 1000}s] Sequence=${JSON.stringify(
-        state.subjectSequence
-    )} (${state.preset})\n`;
     state.timestamp = currentTime;
-    logCurrentSubjects(state);
 };
 
 const muteAllSounds = (state) => {
@@ -56,19 +50,10 @@ const muteAllSounds = (state) => {
     }
 };
 
-const logText = (state, text) => {
+const logText = (state, action, rawData = '', explanation = '') => {
     const currentTime = new Date().getTime();
-    state.logText += `[+${((currentTime - state.timestamp) / 1000).toFixed(3)}s] ${text}\n`;
+    state.logText += `${((currentTime - state.timestamp) / 1000).toFixed(3)},${action},${rawData},${explanation}\n`;
     state.timestamp = currentTime;
-};
-
-const logCurrentSubjects = (state) => {
-    logText(
-        state,
-        `Page=${state.currentPage}; Clips=[${state.currentTrainingSubjectNameList.toString()}]; Test=${
-            state.currentTestSubjectName
-        }; Expect=${state.currentTestSubjectIndex}`
-    );
 };
 
 export const appSlice = createSlice({
@@ -85,12 +70,11 @@ export const appSlice = createSlice({
         // Logs
         logText: '',
         timestamp: new Date().getTime(),
-        numberOfCorrectAnswers: 0,
-        numberOfIncorrectAnswers: 0,
-
-        // Experiment record
         participantID: null,
         experimentType: null, // null | 'areTheyTheSame' | 'whoTypedIt'
+        answerSequence: [], // Array<'Correct'|'Incorrect'>
+        answerIndexSequence: [], // number[]
+        experimentStartTime: new Date().getTime(),
 
         // play controls
         repsPerTrainingClip: 1, // between 1 and (<number of reps in data.json> - 1)
@@ -112,11 +96,11 @@ export const appSlice = createSlice({
          */
         openConfigPanel: (state) => {
             state.isConfigPanelOpen = true;
-            logText(state, 'Config panel open');
+            logText(state, 'Config Panel', 'Open', 'Config panel open');
         },
         closeConfigPanel: (state) => {
             state.isConfigPanelOpen = false;
-            logText(state, 'Config panel closed');
+            logText(state, 'Config Panel', 'Closed', 'Config panel closed');
         },
         nextPage: (state) => {
             state.currentPage += 1;
@@ -130,7 +114,7 @@ export const appSlice = createSlice({
          */
         selectAnswer: (state, action) => {
             state.selectedAnswer = action.payload.index;
-            logText(state, `Select: ${state.selectedAnswer} (${action.payload.text})`);
+            logText(state, 'Select', state.selectedAnswer, action.payload.text);
         },
         clearSelectedAnswer: (state) => {
             state.selectedAnswer = null;
@@ -140,7 +124,7 @@ export const appSlice = createSlice({
          * logs
          */
         logAction: (state, action) => {
-            logText(state, action.payload);
+            logText(state, action.payload.action, action.payload.rawData, action.payload.explanation);
         },
 
         /*
@@ -189,7 +173,6 @@ export const appSlice = createSlice({
             }
             state.currentTestSubjectName = newSubject;
             state.currentTestSubjectIndex = state.currentTrainingSubjectNameList.indexOf(newSubject);
-            logCurrentSubjects(state);
         },
         changeCurrentTrainingSubjectName: (state, action) => {
             // only allows those without a preset to change
@@ -199,7 +182,6 @@ export const appSlice = createSlice({
             const args = action.payload;
             state.currentTrainingSubjectNameList[args.index] = args.name;
             state.subjectSequence[state.currentPage] = state.currentTrainingSubjectNameList;
-            logCurrentSubjects(state);
         },
         setPreset: (state, action) => {
             console.log('set preset', action.payload);
@@ -213,11 +195,8 @@ export const appSlice = createSlice({
         /*
          * submission
          */
-        startExperiment: (state) => {
-            initSubjects(state);
-        },
         setUpScreenOnStart: (state, action) => {
-            logText(state, `Start Experiment: ${action.payload}`);
+            initSubjects(state);
             state.experimentType = action.payload;
             state.currentStage = 'welcome';
             state.currentPage = 0;
@@ -227,18 +206,16 @@ export const appSlice = createSlice({
             state.currentStage = 'experiment';
             state.currentPage = 0;
             state.numberOfPagesInCurrentStage = state.subjectSequence.length;
+            state.experimentStartTime = new Date().getTime();
         },
         // submit answer and log whether true or false
         submitAnswer: (state, action) => {
             muteAllSounds(state);
 
             // log users' answer and update UI
-            logText(state, `Submit: ${state.selectedAnswer} (${action.payload})\n======`);
-            if (action.payload === 'True') {
-                state.numberOfCorrectAnswers += 1;
-            } else {
-                state.numberOfIncorrectAnswers += 1;
-            }
+            logText(state, 'Submit', state.selectedAnswer, action.payload);
+            state.answerSequence.push(action.payload);
+            state.answerIndexSequence.push(state.selectedAnswer);
             state.currentPage += 1;
             state.selectedAnswer = null;
 
@@ -247,14 +224,12 @@ export const appSlice = createSlice({
                 state.currentPage = 0;
                 state.currentStage = 'end';
                 state.numberOfPagesInCurrentStage = 1;
-                logText(state, `Stats: True/False = ${state.numberOfCorrectAnswers}/${state.numberOfIncorrectAnswers}`);
             }
             // else, load new subjects
             else {
                 state.currentTrainingSubjectNameList = state.subjectSequence[state.currentPage].slice();
                 state.currentTestSubjectIndex = getRandomInt(state.currentTrainingSubjectNameList.length);
                 state.currentTestSubjectName = state.currentTrainingSubjectNameList[state.currentTestSubjectIndex];
-                logCurrentSubjects(state);
             }
         },
     },
@@ -279,7 +254,6 @@ export const {
     changeCurrentTrainingSubjectName,
     setPreset,
     clearPreset,
-    startExperiment,
     setUpScreenOnStart,
     welcomeScreenOnStart,
     submitAnswer,

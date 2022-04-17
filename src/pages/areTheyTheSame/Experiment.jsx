@@ -64,12 +64,12 @@ function ExperimentPage() {
     const handleSubmit = () => {
         const clipsAreTheSame = currentTrainingSubjectNameList.reduce((prev, curr) => prev === curr);
         if (selectedAnswer > 0) {
-            dispatch(submitAnswer(clipsAreTheSame ? 'True' : 'False'));
+            dispatch(submitAnswer(clipsAreTheSame ? 'Correct' : 'Incorrect'));
         } else if (selectedAnswer < 0) {
-            dispatch(submitAnswer(clipsAreTheSame ? 'False' : 'True'));
+            dispatch(submitAnswer(clipsAreTheSame ? 'Incorrect' : 'Correct'));
         } else {
-            // subject was unsure, Neither true nor false?
-            dispatch(submitAnswer('N/A'));
+            // subject was unsure, treat as an incorrect
+            dispatch(submitAnswer('Incorrect'));
         }
 
         setShowSubmitMessage(true);
@@ -148,16 +148,18 @@ function ExperimentPage() {
                                     max={100}
                                     min={-100}
                                     defaultValue={-99}
+                                    onMouseDown={() => setHasInitialConfidenceValue(true)}
                                     onChangeCommitted={(_, val) => {
-                                        console.log(val);
-                                        setHasInitialConfidenceValue(true);
                                         dispatch(
                                             selectAnswer({
                                                 index: val,
-                                                text: `${val}% confident they are ${val > 0 ? '' : 'not'} the same`,
+                                                text: `${Math.abs(val)}% confident they are ${
+                                                    val > 0 ? '' : 'not '
+                                                }the same`,
                                             })
                                         );
                                     }}
+                                    color={'secondary'}
                                 />
                             </Stack>
                         </Fade>

@@ -45,7 +45,9 @@ function ExperimentPage() {
 
     const handleSubmit = () => {
         dispatch(
-            submitAnswer(currentTrainingSubjectNameList[selectedAnswer] === currentTestSubjectName ? 'True' : 'False')
+            submitAnswer(
+                currentTrainingSubjectNameList[selectedAnswer] === currentTestSubjectName ? 'Correct' : 'Incorrect'
+            )
         );
 
         setTestClipListened(false);

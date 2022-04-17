@@ -8,7 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField, Button } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField } from '@mui/material';
+import DownloadButton from './DownloadButton';
 
 // icons
 import CloseIcon from '@mui/icons-material/Close';
@@ -21,13 +22,12 @@ import {
     toggleFABVisibility,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
     setSilenceBetweenReps as _setSilenceBetweenReps,
-    clearAllAudios,
     changeCurrentTestSubjectName,
     setPlaybackSpeed,
     setPreset,
 } from '../redux/appSlice';
 
-import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps, download } from '../shared/utils';
+import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps } from '../shared/utils';
 import { CONFIG_PANEL_WIDTH } from '../shared/constants';
 import Data from '../assets/data.json';
 
@@ -55,9 +55,7 @@ const ConfigPanel = () => {
     const _repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
     const _silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
-    const logText = useSelector((state) => state.app.logText);
     const preset = useSelector((state) => state.app.preset);
-    const participantID = useSelector((state) => state.app.participantID);
     const experimentType = useSelector((state) => state.app.experimentType);
 
     // store value locally with "useState", and submit value on blur
@@ -67,11 +65,6 @@ const ConfigPanel = () => {
     const handleClickCloseIcon = React.useCallback(() => {
         dispatch(closeConfigPanel());
     }, [dispatch]);
-
-    const handleDownload = React.useCallback(() => {
-        dispatch(clearAllAudios());
-        download(`${participantID}.log`, logText);
-    }, [dispatch, logText, participantID]);
 
     const isTestSubjectInTrainingSubjects = React.useMemo(() => {
         return currentTrainingSubjectNameList.includes(currentTestSubjectName);
@@ -110,7 +103,7 @@ const ConfigPanel = () => {
                             </Select>
                         </FormControl>
                         {/* Test Clip */}
-                        {experimentType !== 'areTheyTheSame' && (
+                        {experimentType === 'whoTypedIt' && (
                             <FormControl disabled={preset !== 'Random'}>
                                 <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
                                     Test Clip
@@ -223,9 +216,7 @@ const ConfigPanel = () => {
                 </Stack>
                 <Box flex={1} />
                 <Stack margin={2} spacing={1}>
-                    <Button variant={'contained'} disableElevation onClick={handleDownload}>
-                        Download Experiment Log
-                    </Button>
+                    <DownloadButton />
                 </Stack>
             </Box>
         </Drawer>

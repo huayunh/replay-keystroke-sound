@@ -93,7 +93,9 @@ const SoundPlayerCard = (props) => {
             return;
         }
         dispatch(setPlayingClip(clipIndex));
-        dispatch(logAction(`Play: ${clipIndex} (${title})`));
+        dispatch(
+            logAction({ action: 'play', rawData: clipIndex, explanation: `the clip titled "${title}" is played` })
+        );
         setProgress(0);
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
