@@ -103,6 +103,7 @@ function ExperimentPage() {
                         return newList;
                     });
                 }}
+                secretIdentifier={subjectName}
             />
         ),
         // need to force a render when page turns

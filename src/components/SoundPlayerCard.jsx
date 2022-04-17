@@ -61,7 +61,8 @@ const actionHovered = {
  * @param {string} title - string to be displayed on the card and logged for the experimenter
  * @param {number} clipIndex - a unique identifier for the clip
  * @param {boolean} selectable - when false, there will not be a "select" button on the bottom
- * @param {boolean} disabled - when disabled, the select button will still be rendered but will be disabled
+ * @param {boolean} disableSelectButton - when disabled, the select button will still be rendered but will be disabled
+ * @param {string} secretIdentifier - what this clip is (e.g., subject number); meaningful identifier for the experimenters of this study
  * @returns JSX.Element
  */
 const SoundPlayerCard = (props) => {
@@ -71,6 +72,7 @@ const SoundPlayerCard = (props) => {
         clipIndex,
         selectable = false,
         disableSelectButton = false,
+        secretIdentifier = '',
         ...otherProps
     } = props;
     const [isHovered, setIsHovered] = React.useState(false);
@@ -88,13 +90,16 @@ const SoundPlayerCard = (props) => {
     );
 
     const handlePlay = React.useCallback(() => {
-        console.log('handlePlay');
         if (isPlaying) {
             return;
         }
         dispatch(setPlayingClip(clipIndex));
         dispatch(
-            logAction({ action: 'play', rawData: clipIndex, explanation: `the clip titled "${title}" is played` })
+            logAction({
+                action: 'Play',
+                rawData: clipIndex,
+                explanation: `The clip titled "${title}"${secretIdentifier ? `(${secretIdentifier})` : ''} is played`,
+            })
         );
         setProgress(0);
 
@@ -136,10 +141,9 @@ const SoundPlayerCard = (props) => {
         }, playDuration);
         setPlayingTimer(playingTimeout);
         dispatch(addTimeoutID(playingTimeout));
-    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, clipIndex, title]);
+    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, clipIndex, title, secretIdentifier]);
 
     const handleStop = React.useCallback(() => {
-        console.log('handleStop');
         dispatch(clearAllAudios());
         setProgress(null);
         if (playingTimer !== null) {

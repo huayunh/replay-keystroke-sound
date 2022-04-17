@@ -56,6 +56,24 @@ const logText = (state, action, rawData = '', explanation = '') => {
     state.timestamp = currentTime;
 };
 
+const logNewQuestion = (state) => {
+    if (state.experimentType === 'areTheyTheSame') {
+        logText(
+            state,
+            'New Question',
+            state.currentPage + 1,
+            `Clips: ${state.currentTrainingSubjectNameList.join('-')}`
+        );
+    } else if (state.experimentType === 'whoTypedIt') {
+        logText(
+            state,
+            'New Question',
+            state.currentPage + 1,
+            `Test Clip: ${state.currentTestSubjectName}; Subjects: ${state.currentTrainingSubjectNameList.join('-')}`
+        );
+    }
+};
+
 export const appSlice = createSlice({
     name: 'app',
     initialState: {
@@ -207,6 +225,7 @@ export const appSlice = createSlice({
             state.currentPage = 0;
             state.numberOfPagesInCurrentStage = state.subjectSequence.length;
             state.experimentStartTime = new Date().getTime();
+            logNewQuestion(state);
         },
         // submit answer and log whether true or false
         submitAnswer: (state, action) => {
@@ -230,6 +249,7 @@ export const appSlice = createSlice({
                 state.currentTrainingSubjectNameList = state.subjectSequence[state.currentPage].slice();
                 state.currentTestSubjectIndex = getRandomInt(state.currentTrainingSubjectNameList.length);
                 state.currentTestSubjectName = state.currentTrainingSubjectNameList[state.currentTestSubjectIndex];
+                logNewQuestion(state);
             }
         },
     },

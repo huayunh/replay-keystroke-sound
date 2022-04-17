@@ -70,6 +70,7 @@ function ExperimentPage() {
                 title={'Test Clip'}
                 clipIndex={-1}
                 selectable={false}
+                secretIdentifier={currentTestSubjectName}
             />
         ),
         // need to force a render when page turns
@@ -89,6 +90,7 @@ function ExperimentPage() {
                 disabled={!testClipListened}
                 selectable
                 key={subjectIndex}
+                secretIdentifier={subjectName}
             />
         ),
         // need to force a render when page turns

@@ -32,7 +32,8 @@ Type,${experimentType}
 Preset,${preset}
 Total Number of Questions,${answerSequence.length}
 Sequence,${subjectSequence.map((subjectPair) => subjectPair.join('-')).join(',')}
-Answer Correct:Incorrect,${correctCount}:${answerSequence.length - correctCount}
+CorrectAnswers,${correctCount}
+IncorrectAnswers,${answerSequence.length - correctCount}
 Playback Speed,${playbackSpeed}
 `;
         if (experimentType === 'whoTypedIt') {
