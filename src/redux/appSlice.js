@@ -5,6 +5,8 @@ import {
     randomItemsFromArray,
     rangeValue_repsPerTrainingClip,
     rangeValue_silenceBetweenReps,
+    objectToURLParameter,
+    getURLParameterObject,
 } from '../shared/utils';
 import Data from '../assets/data.json';
 
@@ -76,6 +78,12 @@ const logNewQuestion = (state) => {
     }
 };
 
+const updateURLParameters = (state, name, val) => {
+    state.URLParameters[name] = val;
+    const documentSearch = objectToURLParameter(state.URLParameters);
+    window.history.replaceState(null, '', document.location.pathname + documentSearch);
+};
+
 export const appSlice = createSlice({
     name: 'app',
     initialState: {
@@ -109,7 +117,9 @@ export const appSlice = createSlice({
         currentTrainingSubjectNameList: [],
         currentTestSubjectIndex: null, // index in the name list parameter above
         currentTestSubjectName: null,
-        preset: 'Preset A', // 'Random' | 'Preset A' | 'Preset B' | 'Preset C'
+        preset: null, // null | 'Random' | 'Preset A' | 'Preset B' | 'Preset C'
+
+        URLParameters: getURLParameterObject(),
     },
     reducers: {
         /*
@@ -126,11 +136,21 @@ export const appSlice = createSlice({
         nextPage: (state) => {
             state.currentPage += 1;
         },
+        setIsFABVisible: (state, action) => {
+            state.isFABVisible = action.payload;
+            updateURLParameters(state, 'isFABVisible', action.payload);
+        },
         toggleFABVisibility: (state) => {
             state.isFABVisible = !state.isFABVisible;
+            updateURLParameters(state, 'isFABVisible', state.isFABVisible);
+        },
+        setIsProgressBarVisible: (state, action) => {
+            state.isProgressBarVisible = action.payload;
+            updateURLParameters(state, 'isProgressBarVisible', action.payload);
         },
         toggleProgressBarVisibility: (state) => {
             state.isProgressBarVisible = !state.isProgressBarVisible;
+            updateURLParameters(state, 'isProgressBarVisible', state.isProgressBarVisible);
         },
 
         /*
@@ -162,13 +182,21 @@ export const appSlice = createSlice({
          */
 
         setRepsPerTrainingClip: (state, action) => {
-            state.repsPerTrainingClip = rangeValue_repsPerTrainingClip(state.repsPerTrainingClip, action.payload);
+            const newVal = rangeValue_repsPerTrainingClip(state.repsPerTrainingClip, action.payload);
+            state.repsPerTrainingClip = newVal;
+            updateURLParameters(state, 'repsPerTrainingClip', newVal);
         },
         setSilenceBetweenReps: (state, action) => {
-            state.silenceBetweenReps = rangeValue_silenceBetweenReps(state.silenceBetweenReps, action.payload);
+            const newVal = rangeValue_silenceBetweenReps(state.silenceBetweenReps, action.payload);
+            state.silenceBetweenReps = newVal;
+            updateURLParameters(state, 'silenceBetweenReps', newVal);
         },
         setPlaybackSpeed: (state, action) => {
-            state.playbackSpeed = action.payload;
+            const newVal = action.payload;
+            if ([0.5, 0.75, 1.0, 1.25].includes(newVal)) {
+                state.playbackSpeed = newVal;
+                updateURLParameters(state, 'playbackSpeed', newVal);
+            }
         },
         addTimeoutID: (state, action) => {
             state.timeoutIDs.push(action.payload);
@@ -186,7 +214,15 @@ export const appSlice = createSlice({
          */
 
         setParticipantID: (state, action) => {
-            state.participantID = action.payload;
+            const newVal = action.payload;
+
+            if (newVal) {
+                state.participantID = action.payload;
+                updateURLParameters(state, 'participantID', action.payload);
+            } else {
+                state.participantID = null;
+                updateURLParameters(state, 'participantID', undefined);
+            }
         },
 
         /*
@@ -214,11 +250,15 @@ export const appSlice = createSlice({
             state.subjectSequence[state.currentPage] = state.currentTrainingSubjectNameList;
         },
         setPreset: (state, action) => {
-            console.log('set preset', action.payload);
-
+            if (!['Random', 'Preset A', 'Preset B', 'Preset C', null].includes(action.payload)) {
+                return;
+            }
             state.preset = action.payload;
             if (action.payload !== null) {
                 initSubjects(state);
+                updateURLParameters(state, 'preset', action.payload);
+            } else {
+                updateURLParameters(state, 'preset', undefined);
             }
         },
 
@@ -271,7 +311,9 @@ export const {
     openConfigPanel,
     closeConfigPanel,
     nextPage,
+    setIsFABVisible,
     toggleFABVisibility,
+    setIsProgressBarVisible,
     toggleProgressBarVisibility,
     selectAnswer,
     clearSelectedAnswer,

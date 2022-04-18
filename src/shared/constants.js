@@ -6,7 +6,7 @@ export const KEYS = ['period', 't', 'i', 'e', 'five', 'Shift.r', 'o', 'a', 'n', 
  */
 export const IS_KEY_PRESSED_HARD = [true, false, false, false, false, true, false, false, false, false, true];
 
-export const CONFIG_PANEL_WIDTH = 300;
+export const CONFIG_PANEL_WIDTH = 320;
 
 export const PRESET_A = [
     ['s003', 's004'],

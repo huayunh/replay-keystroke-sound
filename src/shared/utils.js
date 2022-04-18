@@ -59,3 +59,38 @@ export const getDownDownStartTimes = (reps, silenceBetweenReps) => {
     });
     return downDownTimerStart;
 };
+
+export const getURLParameterObject = () => {
+    const ret = {};
+
+    const search = document.location.search;
+
+    if (search === '' || search === '?') {
+        return ret;
+    }
+
+    const parameters = search.slice(1).split('&');
+
+    parameters.forEach((parameter) => {
+        const keyVal = parameter.split('=', 2);
+        if (keyVal.length > 1) {
+            ret[keyVal[0]] = decodeURIComponent(keyVal[1]);
+        }
+    });
+    return ret;
+};
+
+export const objectToURLParameter = (obj) => {
+    const objectKeys = Object.keys(obj);
+    if (objectKeys.length === 0) {
+        return '';
+    }
+    let URI = '?';
+    for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj, key) && obj[key] !== undefined) {
+            URI += `${encodeURI(key)}=${encodeURIComponent(obj[key])}&`;
+        }
+    }
+    // get rid of the last "&"
+    return URI.slice(0, -1);
+};

@@ -76,13 +76,15 @@ const ConfigPanel = () => {
         <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
             <Box sx={boxStyle}>
                 <Box margin={2}>
-                    <Stack direction={'row'} spacing={2} alignItems={'center'} marginBottom={1}>
+                    <Stack direction={'row'} spacing={2} alignItems={'center'} marginBottom={0.5}>
                         <IconButton onClick={handleClickCloseIcon} edge={'start'}>
                             <CloseIcon />
                         </IconButton>
                         <Typography variant={'h6'}>Config Panel</Typography>
                     </Stack>
-                    <Typography variant={'body2'}>Bookmark the URL to save these settings.</Typography>
+                    <Typography variant={'body2'} color={'text.secondary'}>
+                        Bookmark the URL to save these settings.
+                    </Typography>
                 </Box>
                 <Stack spacing={4} margin={2} marginTop={3} divider={<Divider flexItem />}>
                     <Stack direction={'column'} spacing={2}>
@@ -91,7 +93,7 @@ const ConfigPanel = () => {
                             <InputLabel id="preset">Preset</InputLabel>
                             <Select
                                 labelId="preset"
-                                value={preset}
+                                value={preset ? preset : ''}
                                 label="Preset"
                                 onChange={(event) => {
                                     dispatch(setPreset(event.target.value));
@@ -154,8 +156,8 @@ const ConfigPanel = () => {
                     {/* MISC Controls */}
                     <Stack direction="column" spacing={2}>
                         <TextField
-                            label="Reps for Each Subject Clip"
-                            variant="outlined"
+                            label={'Reps for Each Subject Clip'}
+                            variant={'outlined'}
                             value={repsPerTrainingClip}
                             type={'number'}
                             onBlur={() => {
@@ -171,8 +173,8 @@ const ConfigPanel = () => {
                             }}
                         />
                         <TextField
-                            label="Silence between Reps"
-                            variant="outlined"
+                            label={'Silence between Reps'}
+                            variant={'outlined'}
                             value={silenceBetweenReps}
                             type={'number'}
                             onBlur={() => {
@@ -212,7 +214,7 @@ const ConfigPanel = () => {
                                     }}
                                 />
                             }
-                            label="Config Panel Button Visible"
+                            label={<Typography variant={'body2'}>Config Panel Button Stays Visible</Typography>}
                         />
                         <FormControlLabel
                             control={
@@ -223,7 +225,7 @@ const ConfigPanel = () => {
                                     }}
                                 />
                             }
-                            label="Progress Bar Visible"
+                            label={<Typography variant={'body2'}>Sound Clip Progress Bar Visible</Typography>}
                         />
                     </Stack>
                 </Stack>

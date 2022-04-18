@@ -8,8 +8,8 @@ import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setPreset, setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
-import useQueryString from '../hooks/useQueryString';
+import { setPreset, setParticipantID as _setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
+import useUpdateStateFromURLParameter from '../hooks/useUpdateStateFromURLParameter';
 
 const wrapperStyle = {
     flexDirection: 'column',
@@ -21,10 +21,16 @@ const wrapperStyle = {
 
 function ExperimentSetUp() {
     const dispatch = useDispatch();
-    const parameters = useQueryString();
     const preset = useSelector((state) => state.app.preset);
     const [participantIDEntered, setParticipantIDEntered] = React.useState(false);
-    const participantID = useSelector((state) => state.app.participantID);
+    const _participantID = useSelector((state) => state.app.participantID);
+    const [participantID, setParticipantID] = React.useState(_participantID);
+
+    useUpdateStateFromURLParameter();
+
+    React.useEffect(() => {
+        setParticipantID(_participantID);
+    }, [_participantID]);
 
     return (
         <Box>
@@ -37,18 +43,27 @@ function ExperimentSetUp() {
                             label={'Subject ID'}
                             variant={'outlined'}
                             value={participantID === null ? '' : participantID}
-                            onChange={(e) => dispatch(setParticipantID(e.target.value))}
-                            onBlur={() => setParticipantIDEntered(true)}
+                            onChange={(e) => {
+                                setParticipantID(e.target.value);
+                            }}
+                            onBlur={() => {
+                                setParticipantIDEntered(true);
+                                if (participantID === '' || participantID === null) {
+                                    dispatch(_setParticipantID(null));
+                                } else {
+                                    dispatch(_setParticipantID(participantID));
+                                }
+                            }}
                             error={participantIDEntered && (participantID === null || participantID === '')}
                             required
                             helperText={'Required'}
                         />
                         <FormControl>
-                            <InputLabel id="preset">Preset</InputLabel>
+                            <InputLabel id={'preset'}>Preset</InputLabel>
                             <Select
-                                labelId="preset"
-                                value={preset}
-                                label="Preset"
+                                labelId={'preset'}
+                                value={preset ? preset : ''}
+                                label={'Preset'}
                                 onChange={(event) => {
                                     dispatch(setPreset(event.target.value));
                                 }}
@@ -69,7 +84,7 @@ function ExperimentSetUp() {
                                 }}
                                 startIcon={<PlayIcon />}
                                 variant={'contained'}
-                                disabled={!participantID}
+                                disabled={!participantID || preset === null}
                             >
                                 Experiment: Are They The Same
                             </Button>
@@ -84,7 +99,7 @@ function ExperimentSetUp() {
                                 }}
                                 startIcon={<PlayIcon />}
                                 variant={'contained'}
-                                disabled={!participantID}
+                                disabled={!participantID || preset === null}
                             >
                                 Experiment: Who Typed It
                             </Button>
