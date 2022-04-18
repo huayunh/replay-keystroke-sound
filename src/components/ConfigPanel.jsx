@@ -72,6 +72,14 @@ const ConfigPanel = () => {
         return currentTrainingSubjectNameList.includes(currentTestSubjectName);
     }, [currentTrainingSubjectNameList, currentTestSubjectName]);
 
+    React.useEffect(() => {
+        setSilenceBetweenReps(_silenceBetweenReps);
+    }, [_silenceBetweenReps]);
+
+    React.useEffect(() => {
+        setRepsPerTrainingClip(_repsPerTrainingClip);
+    }, [_repsPerTrainingClip]);
+
     return (
         <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
             <Box sx={boxStyle}>
