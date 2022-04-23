@@ -37,8 +37,8 @@ function ExperimentPage() {
     const currentPage = useSelector((state) => state.app.currentPage);
     const numberOfScreensInCurrentPhase = useSelector((state) => state.app.numberOfScreensInCurrentPhase);
     const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
-    const currentTestSubjectName = useSelector((state) => state.app.currentTestSubjectName);
-    const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
+    const currentTestTypistName = useSelector((state) => state.app.currentTestTypistName);
+    const currentTrainingTypistNameList = useSelector((state) => state.app.currentTrainingTypistNameList);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
     const [showPageBody, setShowPageBody] = React.useState(true);
     const [testClipListened, setTestClipListened] = React.useState(false);
@@ -46,7 +46,7 @@ function ExperimentPage() {
     const handleSubmit = () => {
         dispatch(
             submitAnswer(
-                currentTrainingSubjectNameList[selectedAnswer] === currentTestSubjectName ? 'Correct' : 'Incorrect'
+                currentTrainingTypistNameList[selectedAnswer] === currentTestTypistName ? 'Correct' : 'Incorrect'
             )
         );
 
@@ -66,31 +66,31 @@ function ExperimentPage() {
     const getTestClip = React.useCallback(
         () => (
             <SoundPlayerCard
-                downDownTimerStart={getDownDownStartTimes([Data[currentTestSubjectName][0]], 0)}
+                downDownTimerStart={getDownDownStartTimes([Data[currentTestTypistName][0]], 0)}
                 title={'Test Clip'}
                 clipIndex={-1}
                 selectable={false}
-                secretIdentifier={currentTestSubjectName}
+                secretIdentifier={currentTestTypistName}
             />
         ),
         // need to force a render when page turns
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [currentPage, currentTestSubjectName]
+        [currentPage, currentTestTypistName]
     );
 
-    const getSubjectClip = React.useCallback(
-        (subjectName, subjectIndex) => (
+    const getTypistClip = React.useCallback(
+        (typistName, typistIndex) => (
             <SoundPlayerCard
-                title={`Subject ${subjectIndex + 1}`}
-                clipIndex={subjectIndex}
+                title={`Typist ${typistIndex + 1}`}
+                clipIndex={typistIndex}
                 downDownTimerStart={getDownDownStartTimes(
-                    Data[subjectName].slice(-repsPerTrainingClip),
+                    Data[typistName].slice(-repsPerTrainingClip),
                     silenceBetweenReps
                 )}
                 disabled={!testClipListened}
                 selectable
-                key={subjectIndex}
-                secretIdentifier={subjectName}
+                key={typistIndex}
+                secretIdentifier={typistName}
             />
         ),
         // need to force a render when page turns
@@ -122,7 +122,7 @@ function ExperimentPage() {
                             </Typography>
                         </Stack>
                         <Stack direction={'row'} spacing={2}>
-                            {currentTrainingSubjectNameList.map(getSubjectClip)}
+                            {currentTrainingTypistNameList.map(getTypistClip)}
                         </Stack>
                     </Stack>
                 </Fade>

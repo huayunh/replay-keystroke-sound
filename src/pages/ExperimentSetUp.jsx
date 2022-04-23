@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setPreset, setParticipantID as _setParticipantID, setUpScreenOnStart } from '../redux/appSlice';
+import { setPreset, setSubjectID as _setSubjectID, setUpScreenOnStart } from '../redux/appSlice';
 import useUpdateStateFromURLParameter from '../hooks/useUpdateStateFromURLParameter';
 
 const wrapperStyle = {
@@ -22,15 +22,15 @@ const wrapperStyle = {
 function ExperimentSetUp() {
     const dispatch = useDispatch();
     const preset = useSelector((state) => state.app.preset);
-    const [participantIDEntered, setParticipantIDEntered] = React.useState(false);
-    const _participantID = useSelector((state) => state.app.participantID);
-    const [participantID, setParticipantID] = React.useState(_participantID);
+    const [subjectIDEntered, setSubjectIDEntered] = React.useState(false);
+    const _subjectID = useSelector((state) => state.app.subjectID);
+    const [subjectID, setSubjectID] = React.useState(_subjectID);
 
     useUpdateStateFromURLParameter();
 
     React.useEffect(() => {
-        setParticipantID(_participantID);
-    }, [_participantID]);
+        setSubjectID(_subjectID);
+    }, [_subjectID]);
 
     return (
         <Box>
@@ -42,19 +42,19 @@ function ExperimentSetUp() {
                             autoFocus
                             label={'Subject ID'}
                             variant={'outlined'}
-                            value={participantID === null ? '' : participantID}
+                            value={subjectID === null ? '' : subjectID}
                             onChange={(e) => {
-                                setParticipantID(e.target.value);
+                                setSubjectID(e.target.value);
                             }}
                             onBlur={() => {
-                                setParticipantIDEntered(true);
-                                if (participantID === '' || participantID === null) {
-                                    dispatch(_setParticipantID(null));
+                                setSubjectIDEntered(true);
+                                if (subjectID === '' || subjectID === null) {
+                                    dispatch(_setSubjectID(null));
                                 } else {
-                                    dispatch(_setParticipantID(participantID));
+                                    dispatch(_setSubjectID(subjectID));
                                 }
                             }}
-                            error={participantIDEntered && (participantID === null || participantID === '')}
+                            error={subjectIDEntered && (subjectID === null || subjectID === '')}
                             required
                             helperText={'Required'}
                         />
@@ -84,7 +84,7 @@ function ExperimentSetUp() {
                                 }}
                                 startIcon={<PlayIcon />}
                                 variant={'contained'}
-                                disabled={!participantID || preset === null}
+                                disabled={!subjectID || preset === null}
                             >
                                 Experiment: Are They The Same
                             </Button>
@@ -99,7 +99,7 @@ function ExperimentSetUp() {
                                 }}
                                 startIcon={<PlayIcon />}
                                 variant={'contained'}
-                                disabled={!participantID || preset === null}
+                                disabled={!subjectID || preset === null}
                             >
                                 Experiment: Who Typed It
                             </Button>

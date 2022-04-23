@@ -17,13 +17,13 @@ import CloseIcon from '@mui/icons-material/Close';
 // redux
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    changeCurrentTrainingSubjectName,
+    changeCurrentTrainingTypistName,
     closeConfigPanel,
     toggleFABVisibility,
     toggleProgressBarVisibility,
     setRepsPerTrainingClip as _setRepsPerTrainingClip,
     setSilenceBetweenReps as _setSilenceBetweenReps,
-    changeCurrentTestSubjectName,
+    changecurrentTestTypistName,
     setPlaybackSpeed,
     setPreset,
 } from '../redux/appSlice';
@@ -39,10 +39,10 @@ const boxStyle = {
     height: '100%',
 };
 
-const getSubjectSelectMenuItem = () => {
-    return Data.subjects.map((subjectName, index) => (
-        <MenuItem key={index} value={subjectName}>
-            {subjectName}
+const getTypistSelectMenuItem = () => {
+    return Data.typists.map((typistName, index) => (
+        <MenuItem key={index} value={typistName}>
+            {typistName}
         </MenuItem>
     ));
 };
@@ -51,8 +51,8 @@ const ConfigPanel = () => {
     const dispatch = useDispatch();
     const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
     const isFABVisible = useSelector((state) => state.app.isFABVisible);
-    const currentTestSubjectName = useSelector((state) => state.app.currentTestSubjectName);
-    const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
+    const currentTestTypistName = useSelector((state) => state.app.currentTestTypistName);
+    const currentTrainingTypistNameList = useSelector((state) => state.app.currentTrainingTypistNameList);
     const _repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
     const _silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
@@ -68,9 +68,9 @@ const ConfigPanel = () => {
         dispatch(closeConfigPanel());
     }, [dispatch]);
 
-    const isTestSubjectInTrainingSubjects = React.useMemo(() => {
-        return currentTrainingSubjectNameList.includes(currentTestSubjectName);
-    }, [currentTrainingSubjectNameList, currentTestSubjectName]);
+    const isTestTypistInTrainingTypists = React.useMemo(() => {
+        return currentTrainingTypistNameList.includes(currentTestTypistName);
+    }, [currentTrainingTypistNameList, currentTestTypistName]);
 
     React.useEffect(() => {
         setSilenceBetweenReps(_silenceBetweenReps);
@@ -117,45 +117,47 @@ const ConfigPanel = () => {
                         {/* Test Clip */}
                         {experimentType === 'whoTypedIt' && (
                             <FormControl disabled={preset !== 'Random'}>
-                                <InputLabel id="test-subject" error={!isTestSubjectInTrainingSubjects}>
+                                <InputLabel id="test-typist" error={!isTestTypistInTrainingTypists}>
                                     Test Clip
                                 </InputLabel>
                                 <Select
-                                    labelId="test-subject"
-                                    value={isTestSubjectInTrainingSubjects ? currentTestSubjectName : ''}
+                                    labelId="test-typist"
+                                    value={isTestTypistInTrainingTypists ? currentTestTypistName : ''}
                                     label="Test Clip"
                                     onChange={(event) => {
-                                        dispatch(changeCurrentTestSubjectName(event.target.value));
+                                        dispatch(changecurrentTestTypistName(event.target.value));
                                     }}
-                                    error={!isTestSubjectInTrainingSubjects}
+                                    error={!isTestTypistInTrainingTypists}
                                 >
-                                    {currentTrainingSubjectNameList.map((trainingSubjectName, trainingSubjectIndex) => (
-                                        <MenuItem value={trainingSubjectName} key={trainingSubjectIndex}>
-                                            {trainingSubjectName}
+                                    {currentTrainingTypistNameList.map((trainingTypistName, trainingTypistIndex) => (
+                                        <MenuItem value={trainingTypistName} key={trainingTypistIndex}>
+                                            {trainingTypistName}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
                         )}
-                        {/* Subjects */}
+                        {/* Typists */}
                         <Stack direction={'row'} spacing={2}>
-                            {currentTrainingSubjectNameList.map((subjectName, subjectIndex) => (
-                                <FormControl fullWidth key={subjectIndex} disabled={preset !== 'Random'}>
-                                    <InputLabel id="training-subject-a">Subject {subjectIndex + 1}</InputLabel>
+                            {currentTrainingTypistNameList.map((typistName, typistIndex) => (
+                                <FormControl fullWidth key={typistIndex} disabled={preset !== 'Random'}>
+                                    <InputLabel id={`training-typist-${typistIndex}`}>
+                                        Typist {typistIndex + 1}
+                                    </InputLabel>
                                     <Select
-                                        labelId="training-subject-a"
-                                        value={subjectName}
-                                        label={`Subject ${subjectIndex + 1}`}
+                                        labelId={`training-typist-${typistIndex}`}
+                                        value={typistName}
+                                        label={`Typist ${typistIndex + 1}`}
                                         onChange={(event) => {
                                             dispatch(
-                                                changeCurrentTrainingSubjectName({
+                                                changeCurrentTrainingTypistName({
                                                     name: event.target.value,
-                                                    index: subjectIndex,
+                                                    index: typistIndex,
                                                 })
                                             );
                                         }}
                                     >
-                                        {getSubjectSelectMenuItem()}
+                                        {getTypistSelectMenuItem()}
                                     </Select>
                                 </FormControl>
                             ))}
@@ -164,7 +166,7 @@ const ConfigPanel = () => {
                     {/* MISC Controls */}
                     <Stack direction="column" spacing={2}>
                         <TextField
-                            label={'Reps for Each Subject Clip'}
+                            label={'Reps for Each Typist Clip'}
                             variant={'outlined'}
                             value={repsPerTrainingClip}
                             type={'number'}

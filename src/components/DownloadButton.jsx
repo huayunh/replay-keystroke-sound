@@ -16,10 +16,10 @@ const DownloadButton = () => {
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const logText = useSelector((state) => state.app.logText);
     const preset = useSelector((state) => state.app.preset);
-    const participantID = useSelector((state) => state.app.participantID);
+    const subjectID = useSelector((state) => state.app.subjectID);
     const experimentType = useSelector((state) => state.app.experimentType);
     const experimentStartTime = useSelector((state) => state.app.experimentStartTime);
-    const subjectSequence = useSelector((state) => state.app.subjectSequence);
+    const typistSequence = useSelector((state) => state.app.typistSequence);
     const answerSequence = useSelector((state) => state.app.answerSequence);
     const answerIndexSequence = useSelector((state) => state.app.answerIndexSequence);
     const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
@@ -28,19 +28,19 @@ const DownloadButton = () => {
         dispatch(clearAllAudios());
         const correctCount = answerSequence.filter((ans) => ans === 'Correct').length;
         const startTimeDateObj = new Date(experimentStartTime);
-        let summary = `Participant,${participantID}
+        let summary = `Subject,${subjectID}
 Time,${startTimeDateObj.toLocaleDateString()} ${startTimeDateObj.toLocaleTimeString()}
 Type,${experimentType}
 Preset,${preset}
 Total Number of Questions,${answerSequence.length}
-Sequence,${subjectSequence.map((subjectPair) => subjectPair.join('-')).join(',')}
+Typist Sequence,${typistSequence.map((typistPair) => typistPair.join('-')).join(',')}
 CorrectAnswers,${correctCount}
 IncorrectAnswers,${answerSequence.length - correctCount}
 Playback Speed,${playbackSpeed}
 Is Progress Bar Visible,${isProgressBarVisible}
 `;
         if (experimentType === 'whoTypedIt') {
-            summary += `Repitions for Each Subject Clip,${repsPerTrainingClip}
+            summary += `Repitions for Each Typist Clip,${repsPerTrainingClip}
 Silence between Repitions (ms),${silenceBetweenReps}
 `;
         }
@@ -58,7 +58,7 @@ Detailed Events
 ===============
 Time Elapsed Since Previous Log Item (seconds),Action,Raw Data,Explanation
 `;
-        download(`${participantID}.csv`, summary + logText);
+        download(`${subjectID}.csv`, summary + logText);
     };
 
     return (

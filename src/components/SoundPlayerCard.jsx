@@ -62,7 +62,7 @@ const actionHovered = {
  * @param {number} clipIndex - a unique identifier for the clip
  * @param {boolean} selectable - when false, there will not be a "select" button on the bottom
  * @param {boolean} disableSelectButton - when disabled, the select button will still be rendered but will be disabled
- * @param {string} secretIdentifier - what this clip is (e.g., subject number); meaningful identifier for the experimenters of this study
+ * @param {string} secretIdentifier - what this clip is (e.g., typist index); meaningful identifier for the experimenters of this study
  * @returns JSX.Element
  */
 const SoundPlayerCard = (props) => {

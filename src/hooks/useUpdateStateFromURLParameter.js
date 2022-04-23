@@ -3,7 +3,7 @@ import * as React from 'react';
 import { getURLParameterObject } from '../shared/utils';
 import {
     setPreset,
-    setParticipantID,
+    setSubjectID,
     setPlaybackSpeed,
     setIsFABVisible,
     setIsProgressBarVisible,
@@ -17,7 +17,7 @@ const useUpdateStateFromURLParameter = () => {
     const parameters = getURLParameterObject();
 
     const preset = useSelector((state) => state.app.preset);
-    const participantID = useSelector((state) => state.app.participantID);
+    const subjectID = useSelector((state) => state.app.subjectID);
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const isFABVisible = useSelector((state) => state.app.isFABVisible);
     const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
@@ -28,8 +28,8 @@ const useUpdateStateFromURLParameter = () => {
         if (parameters.preset && parameters.preset !== preset) {
             dispatch(setPreset(parameters.preset));
         }
-        if (parameters.participantID && parameters.participantID !== participantID) {
-            dispatch(setParticipantID(parameters.participantID));
+        if (parameters.subjectID && parameters.subjectID !== subjectID) {
+            dispatch(setSubjectID(parameters.subjectID));
         }
         if (parameters.playbackSpeed) {
             const parsedPlaybackSpeed = parseFloat(parameters.playbackSpeed);
@@ -65,7 +65,7 @@ const useUpdateStateFromURLParameter = () => {
         dispatch,
         parameters,
         preset,
-        participantID,
+        subjectID,
         playbackSpeed,
         isFABVisible,
         isProgressBarVisible,

@@ -58,19 +58,17 @@ function ExperimentPage() {
     const currentPage = useSelector((state) => state.app.currentPage);
     const numberOfScreensInCurrentPhase = useSelector((state) => state.app.numberOfScreensInCurrentPhase);
     const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
-    const currentTrainingSubjectNameList = useSelector((state) => state.app.currentTrainingSubjectNameList);
+    const currentTrainingTypistNameList = useSelector((state) => state.app.currentTrainingTypistNameList);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
     const [showPageBody, setShowPageBody] = React.useState(true);
-    const [clipListened, setClipListened] = React.useState(
-        new Array(currentTrainingSubjectNameList.length).fill(false)
-    );
+    const [clipListened, setClipListened] = React.useState(new Array(currentTrainingTypistNameList.length).fill(false));
     const allClipsListened = React.useMemo(() => {
         return clipListened.reduce((prev, curr) => prev && curr);
     }, [clipListened]);
     const [hasInitialConfidenceValue, setHasInitialConfidenceValue] = React.useState(false);
 
     const handleSubmit = () => {
-        const clipsAreTheSame = currentTrainingSubjectNameList.reduce((prev, curr) => prev === curr);
+        const clipsAreTheSame = currentTrainingTypistNameList.reduce((prev, curr) => prev === curr);
         if (selectedAnswer > 0) {
             dispatch(submitAnswer(clipsAreTheSame ? 'Correct' : 'Incorrect'));
         } else if (selectedAnswer < 0) {
@@ -90,28 +88,28 @@ function ExperimentPage() {
             setShowPageBody(true);
         }, 500);
 
-        setClipListened(new Array(currentTrainingSubjectNameList.length).fill(false));
+        setClipListened(new Array(currentTrainingTypistNameList.length).fill(false));
         setHasInitialConfidenceValue(false);
     };
 
-    const getSubjectClip = React.useCallback(
-        (subjectName, subjectIndex) => (
+    const getTypistClip = React.useCallback(
+        (typistName, typistIndex) => (
             <SoundPlayerCard
-                title={`Clip ${subjectIndex + 1}`}
-                clipIndex={subjectIndex}
+                title={`Clip ${typistIndex + 1}`}
+                clipIndex={typistIndex}
                 downDownTimerStart={getDownDownStartTimes(
-                    Data[subjectName].slice(-repsPerTrainingClip),
+                    Data[typistName].slice(-repsPerTrainingClip),
                     silenceBetweenReps
                 )}
-                key={subjectIndex}
+                key={typistIndex}
                 onClick={() => {
                     setClipListened((oldList) => {
                         const newList = oldList.slice();
-                        newList[subjectIndex] = true;
+                        newList[typistIndex] = true;
                         return newList;
                     });
                 }}
-                secretIdentifier={subjectName}
+                secretIdentifier={typistName}
             />
         ),
         // need to force a render when page turns
@@ -137,7 +135,7 @@ function ExperimentPage() {
                                 </Typography>
                             </Stack>
                             <Stack direction={'row'} spacing={2}>
-                                {currentTrainingSubjectNameList.map(getSubjectClip)}
+                                {currentTrainingTypistNameList.map(getTypistClip)}
                             </Stack>
                         </Stack>
                         <Fade in={allClipsListened}>

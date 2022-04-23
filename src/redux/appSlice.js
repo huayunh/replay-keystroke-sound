@@ -10,28 +10,28 @@ import {
 } from '../shared/utils';
 import Data from '../assets/data.json';
 
-const initSubjects = (state) => {
+const initTypists = (state) => {
     if (state.preset === 'Preset A') {
-        state.subjectSequence = PRESET_A.slice();
+        state.typistSequence = PRESET_A.slice();
     } else if (state.preset === 'Preset B') {
-        state.subjectSequence = PRESET_B.slice();
+        state.typistSequence = PRESET_B.slice();
     } else if (state.preset === 'Preset C') {
-        state.subjectSequence = PRESET_C.slice();
+        state.typistSequence = PRESET_C.slice();
     } else {
-        // by default, choose 5 pairs of subjects by random
-        const pairsOfSubject = 5;
-        state.numberOfScreensInCurrentPhase = pairsOfSubject;
-        const randomSubjects = randomItemsFromArray(Data.subjects.slice(), pairsOfSubject * 2);
+        // by default, choose 5 pairs of typists by random
+        const pairsOfTypist = 5;
+        state.numberOfScreensInCurrentPhase = pairsOfTypist;
+        const randomTypists = randomItemsFromArray(Data.typists.slice(), pairsOfTypist * 2);
         const newPairs = [];
-        for (let i = 0; i < pairsOfSubject; i++) {
-            newPairs.push([randomSubjects[i * 2], randomSubjects[i * 2 + 1]]);
+        for (let i = 0; i < pairsOfTypist; i++) {
+            newPairs.push([randomTypists[i * 2], randomTypists[i * 2 + 1]]);
         }
-        state.subjectSequence = newPairs;
+        state.typistSequence = newPairs;
     }
-    state.numberOfScreensInCurrentPhase = state.subjectSequence.length;
-    state.currentTrainingSubjectNameList = state.subjectSequence[0].slice();
-    state.currentTestSubjectIndex = getRandomInt(state.currentTrainingSubjectNameList.length);
-    state.currentTestSubjectName = state.currentTrainingSubjectNameList[state.currentTestSubjectIndex];
+    state.numberOfScreensInCurrentPhase = state.typistSequence.length;
+    state.currentTrainingTypistNameList = state.typistSequence[0].slice();
+    state.currentTestTypistIndex = getRandomInt(state.currentTrainingTypistNameList.length);
+    state.currentTestTypistName = state.currentTrainingTypistNameList[state.currentTestTypistIndex];
 
     const currentTime = new Date().getTime();
     state.timestamp = currentTime;
@@ -65,7 +65,7 @@ const logNewQuestion = (state) => {
             'New Question',
             'Current Question',
             state.currentPage + 1,
-            `Clips: ${state.currentTrainingSubjectNameList.join('-')}`
+            `Clips: ${state.currentTrainingTypistNameList.join('-')}`
         );
     } else if (state.experimentType === 'whoTypedIt') {
         logText(
@@ -73,7 +73,7 @@ const logNewQuestion = (state) => {
             'New Question',
             'Current Question',
             state.currentPage + 1,
-            `Test Clip: ${state.currentTestSubjectName}; Subjects: ${state.currentTrainingSubjectNameList.join('-')}`
+            `Test Clip: ${state.currentTestTypistName}; Typists: ${state.currentTrainingTypistNameList.join('-')}`
         );
     }
 };
@@ -99,7 +99,7 @@ export const appSlice = createSlice({
         // Logs
         logText: '',
         timestamp: new Date().getTime(),
-        participantID: null,
+        subjectID: null,
         experimentType: null, // null | 'areTheyTheSame' | 'whoTypedIt'
         answerSequence: [], // Array<'Correct'|'Incorrect'>
         answerIndexSequence: [], // number[]
@@ -112,11 +112,11 @@ export const appSlice = createSlice({
         playingClipIndex: null, // test = -1, first clip = 0, second clip = 1
         timeoutIDs: [], // to store all the setTimeout IDs from audios
 
-        // subjects
-        subjectSequence: [],
-        currentTrainingSubjectNameList: [],
-        currentTestSubjectIndex: null, // index in the name list parameter above
-        currentTestSubjectName: null,
+        // typists
+        typistSequence: [],
+        currentTrainingTypistNameList: [],
+        currentTestTypistIndex: null, // index in the name list parameter above
+        currentTestTypistName: null,
         preset: null, // null | 'Random' | 'Preset A' | 'Preset B' | 'Preset C'
 
         URLParameters: getURLParameterObject(),
@@ -213,41 +213,41 @@ export const appSlice = createSlice({
          * Experiment control
          */
 
-        setParticipantID: (state, action) => {
+        setSubjectID: (state, action) => {
             const newVal = action.payload;
 
             if (newVal) {
-                state.participantID = action.payload;
-                updateURLParameters(state, 'participantID', action.payload);
+                state.subjectID = action.payload;
+                updateURLParameters(state, 'subjectID', action.payload);
             } else {
-                state.participantID = null;
-                updateURLParameters(state, 'participantID', undefined);
+                state.subjectID = null;
+                updateURLParameters(state, 'subjectID', undefined);
             }
         },
 
         /*
-         * subjects
+         * typists
          */
-        changeCurrentTestSubjectName: (state, action) => {
+        changecurrentTestTypistName: (state, action) => {
             // only allows those without a preset to change
             if (state.preset !== 'Random') {
                 return;
             }
-            const newSubject = action.payload;
-            if (!state.currentTrainingSubjectNameList.includes(newSubject)) {
+            const newTypist = action.payload;
+            if (!state.currentTrainingTypistNameList.includes(newTypist)) {
                 return;
             }
-            state.currentTestSubjectName = newSubject;
-            state.currentTestSubjectIndex = state.currentTrainingSubjectNameList.indexOf(newSubject);
+            state.currentTestTypistName = newTypist;
+            state.currentTestTypistIndex = state.currentTrainingTypistNameList.indexOf(newTypist);
         },
-        changeCurrentTrainingSubjectName: (state, action) => {
+        changeCurrentTrainingTypistName: (state, action) => {
             // only allows those without a preset to change
             if (state.preset !== 'Random') {
                 return;
             }
             const args = action.payload;
-            state.currentTrainingSubjectNameList[args.index] = args.name;
-            state.subjectSequence[state.currentPage] = state.currentTrainingSubjectNameList;
+            state.currentTrainingTypistNameList[args.index] = args.name;
+            state.typistSequence[state.currentPage] = state.currentTrainingTypistNameList;
         },
         setPreset: (state, action) => {
             if (!['Random', 'Preset A', 'Preset B', 'Preset C', null].includes(action.payload)) {
@@ -255,7 +255,7 @@ export const appSlice = createSlice({
             }
             state.preset = action.payload;
             if (action.payload !== null) {
-                initSubjects(state);
+                initTypists(state);
                 updateURLParameters(state, 'preset', action.payload);
             } else {
                 updateURLParameters(state, 'preset', undefined);
@@ -266,7 +266,7 @@ export const appSlice = createSlice({
          * submission
          */
         setUpScreenOnStart: (state, action) => {
-            initSubjects(state);
+            initTypists(state);
             state.experimentType = action.payload;
             state.currentStage = 'welcome';
             state.currentPage = 0;
@@ -275,7 +275,7 @@ export const appSlice = createSlice({
         welcomeScreenOnStart: (state) => {
             state.currentStage = 'experiment';
             state.currentPage = 0;
-            state.numberOfPagesInCurrentStage = state.subjectSequence.length;
+            state.numberOfPagesInCurrentStage = state.typistSequence.length;
             state.experimentStartTime = new Date().getTime();
             logNewQuestion(state);
         },
@@ -296,11 +296,11 @@ export const appSlice = createSlice({
                 state.currentStage = 'end';
                 state.numberOfPagesInCurrentStage = 1;
             }
-            // else, load new subjects
+            // else, load new typists
             else {
-                state.currentTrainingSubjectNameList = state.subjectSequence[state.currentPage].slice();
-                state.currentTestSubjectIndex = getRandomInt(state.currentTrainingSubjectNameList.length);
-                state.currentTestSubjectName = state.currentTrainingSubjectNameList[state.currentTestSubjectIndex];
+                state.currentTrainingTypistNameList = state.typistSequence[state.currentPage].slice();
+                state.currentTestTypistIndex = getRandomInt(state.currentTrainingTypistNameList.length);
+                state.currentTestTypistName = state.currentTrainingTypistNameList[state.currentTestTypistIndex];
                 logNewQuestion(state);
             }
         },
@@ -324,9 +324,9 @@ export const {
     addTimeoutID,
     setPlayingClip,
     clearAllAudios,
-    setParticipantID,
-    changeCurrentTestSubjectName,
-    changeCurrentTrainingSubjectName,
+    setSubjectID,
+    changecurrentTestTypistName,
+    changeCurrentTrainingTypistName,
     setPreset,
     clearPreset,
     setUpScreenOnStart,
