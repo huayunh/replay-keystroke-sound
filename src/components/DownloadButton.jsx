@@ -14,6 +14,7 @@ const DownloadButton = () => {
     const repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
     const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
+    const variedKeystrokeSound = useSelector((state) => state.app.variedKeystrokeSound);
     const logText = useSelector((state) => state.app.logText);
     const preset = useSelector((state) => state.app.preset);
     const subjectID = useSelector((state) => state.app.subjectID);
@@ -45,6 +46,7 @@ Correct Answers,${correctCount}
 Incorrect Answers,${answerSequence.length - correctCount}
 Playback Speed,${playbackSpeed}
 Is Progress Bar Visible,${isProgressBarVisible}
+Use Varied Keystroke Sound,${variedKeystrokeSound}
 `;
         if (experimentType === 'whoTypedIt') {
             summary += `Repitions for Each Typist Clip,${repsPerTrainingClip}

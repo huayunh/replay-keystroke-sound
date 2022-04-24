@@ -26,6 +26,7 @@ import {
     changecurrentTestTypistName,
     setPlaybackSpeed,
     setPreset,
+    setVariedKeystrokeSound,
 } from '../redux/appSlice';
 
 import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps } from '../shared/utils';
@@ -59,6 +60,7 @@ const ConfigPanel = () => {
     const preset = useSelector((state) => state.app.preset);
     const experimentType = useSelector((state) => state.app.experimentType);
     const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
+    const variedKeystrokeSound = useSelector((state) => state.app.variedKeystrokeSound);
 
     // store value locally with "useState", and submit value on blur
     const [repsPerTrainingClip, setRepsPerTrainingClip] = React.useState(_repsPerTrainingClip);
@@ -236,6 +238,17 @@ const ConfigPanel = () => {
                                 />
                             }
                             label={<Typography variant={'body2'}>Sound Clip Progress Bar Visible</Typography>}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={variedKeystrokeSound}
+                                    onChange={() => {
+                                        dispatch(setVariedKeystrokeSound(!variedKeystrokeSound));
+                                    }}
+                                />
+                            }
+                            label={<Typography variant={'body2'}>Use Varied Keystroke Sound</Typography>}
                         />
                     </Stack>
                 </Stack>

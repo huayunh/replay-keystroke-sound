@@ -9,6 +9,7 @@ import {
     setIsProgressBarVisible,
     setSilenceBetweenReps,
     setRepsPerTrainingClip,
+    setVariedKeystrokeSound,
 } from '../redux/appSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -23,6 +24,7 @@ const useUpdateStateFromURLParameter = () => {
     const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
     const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
     const repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
+    const variedKeystrokeSound = useSelector((state) => state.app.variedKeystrokeSound);
 
     React.useEffect(() => {
         if (parameters.preset && parameters.preset !== preset) {
@@ -59,6 +61,12 @@ const useUpdateStateFromURLParameter = () => {
             const parsedRepsPerTrainingClip = parseInt(parameters.repsPerTrainingClip);
             if (parsedRepsPerTrainingClip !== repsPerTrainingClip) {
                 dispatch(setRepsPerTrainingClip(parsedRepsPerTrainingClip));
+            }
+        }
+        if (parameters.variedKeystrokeSound) {
+            const parsedVariedKeystrokeSound = parameters.variedKeystrokeSound === 'true';
+            if (parsedVariedKeystrokeSound !== variedKeystrokeSound) {
+                dispatch(setVariedKeystrokeSound(parsedVariedKeystrokeSound));
             }
         }
     }, [

@@ -84,6 +84,7 @@ const SoundPlayerCard = (props) => {
     const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const currentPage = useSelector((state) => state.app.currentPage);
     const isProgressBarVisible = useSelector((state) => state.app.isProgressBarVisible);
+    const variedKeystrokeSound = useSelector((state) => state.app.variedKeystrokeSound);
 
     const playDuration = React.useMemo(
         () => downDownTimerStart[downDownTimerStart.length - 1] / playbackSpeed + 500,
@@ -100,7 +101,7 @@ const SoundPlayerCard = (props) => {
         for (let i = 0; i < downDownTimerStart.length; i++) {
             const timeoutID = setTimeout(() => {
                 const audio = document.createElement('audio');
-                if (IS_KEY_PRESSED_HARD[i % IS_KEY_PRESSED_HARD.length]) {
+                if (variedKeystrokeSound && IS_KEY_PRESSED_HARD[i % IS_KEY_PRESSED_HARD.length]) {
                     audio.src = KeyStrokeHardSound;
                 } else {
                     audio.src = KeyStrokeLightSound;
@@ -135,7 +136,17 @@ const SoundPlayerCard = (props) => {
         }, playDuration);
         setPlayingTimer(playingTimeout);
         dispatch(addTimeoutID(playingTimeout));
-    }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, clipIndex, title, secretIdentifier]);
+    }, [
+        dispatch,
+        isPlaying,
+        downDownTimerStart,
+        playDuration,
+        playbackSpeed,
+        clipIndex,
+        title,
+        secretIdentifier,
+        variedKeystrokeSound,
+    ]);
 
     const handleStop = React.useCallback(() => {
         dispatch(onAudioStopped({ index: clipIndex, title: title, name: secretIdentifier }));

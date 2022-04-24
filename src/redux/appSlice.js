@@ -107,6 +107,7 @@ export const appSlice = createSlice({
         playbackSpeed: 1.0,
         playingClipIndex: null, // test = -1, first clip = 0, second clip = 1
         timeoutIDs: [], // to store all the setTimeout IDs from audios
+        variedKeystrokeSound: true,
 
         // typists
         typistSequence: [],
@@ -148,9 +149,13 @@ export const appSlice = createSlice({
             state.isProgressBarVisible = !state.isProgressBarVisible;
             updateURLParameters(state, 'isProgressBarVisible', state.isProgressBarVisible);
         },
+        setVariedKeystrokeSound: (state, action) => {
+            state.variedKeystrokeSound = action.payload;
+            updateURLParameters(state, 'variedKeystrokeSound', action.payload);
+        },
 
         /*
-         * store answer from users
+         * store answer from subjects
          */
         selectAnswer: (state, action) => {
             state.selectedAnswer = action.payload;
@@ -316,6 +321,7 @@ export const {
     toggleFABVisibility,
     setIsProgressBarVisible,
     toggleProgressBarVisibility,
+    setVariedKeystrokeSound,
     selectAnswer,
     clearSelectedAnswer,
     logAction,
