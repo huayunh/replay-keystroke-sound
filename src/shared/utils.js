@@ -94,3 +94,17 @@ export const objectToURLParameter = (obj) => {
     // get rid of the last "&"
     return URI.slice(0, -1);
 };
+
+export const millisecondToHMS = (n) => {
+    const second = Math.floor(n / 1000);
+    const ret = {
+        hour: Math.floor(second / 3600),
+        minute: Math.floor((second % 3600) / 60)
+            .toString()
+            .padStart(2, '0'),
+        second: (second % 60).toString().padStart(2, '0'),
+        millisecond: (n % 1000).toString().padStart(3, '0'),
+    };
+    ret.string = `${ret.hour}:${ret.minute}:${ret.second}.${ret.millisecond}`;
+    return ret;
+};

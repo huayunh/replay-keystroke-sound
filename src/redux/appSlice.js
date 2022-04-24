@@ -7,6 +7,7 @@ import {
     rangeValue_silenceBetweenReps,
     objectToURLParameter,
     getURLParameterObject,
+    millisecondToHMS,
 } from '../shared/utils';
 import Data from '../assets/data.json';
 
@@ -50,32 +51,25 @@ const muteAllSounds = (state) => {
     }
 };
 
-const logText = (state, action, parameter = '', rawData = '', explanation = '') => {
-    const currentTime = new Date().getTime();
-    state.logText += `${((currentTime - state.timestamp) / 1000).toFixed(
-        3
-    )},${action},${parameter},${rawData},${explanation}\n`;
-    state.timestamp = currentTime;
-};
-
-const logNewQuestion = (state) => {
-    if (state.experimentType === 'areTheyTheSame') {
-        logText(
-            state,
-            'New Question',
-            'Current Question',
-            state.currentPage + 1,
-            `Clips: ${state.currentTrainingTypistNameList.join('-')}`
-        );
-    } else if (state.experimentType === 'whoTypedIt') {
-        logText(
-            state,
-            'New Question',
-            'Current Question',
-            state.currentPage + 1,
-            `Test Clip: ${state.currentTestTypistName}; Typists: ${state.currentTrainingTypistNameList.join('-')}`
-        );
+const logText = (state, event, typistPlayed = null, decision = null) => {
+    const currentTime = new Date();
+    const timestampUTCISO = currentTime.toISOString();
+    const timestampLocal = `${currentTime.toLocaleDateString()} ${currentTime.toLocaleTimeString()}`;
+    const timeElapsed = millisecondToHMS(currentTime.getTime() - state.timestamp).string;
+    const testClip = state.experimentType === 'whoTypedIt' ? ',' + state.currentTestTypistName : '';
+    let answerFromSubject = null;
+    if (state.selectedAnswer !== null) {
+        answerFromSubject =
+            state.experimentType === 'whoTypedIt'
+                ? state.currentTrainingTypistNameList[state.selectedAnswer]
+                : `${state.selectedAnswer}%`;
     }
+    state.logText += `${state.subjectID},${
+        state.currentPage + 1
+    },${timestampUTCISO},${timestampLocal},${timeElapsed},${state.currentTrainingTypistNameList.join(
+        ','
+    )}${testClip},${event},${typistPlayed},${answerFromSubject},${decision}\n`;
+    state.timestamp = currentTime.getTime();
 };
 
 const updateURLParameters = (state, name, val) => {
@@ -104,6 +98,8 @@ export const appSlice = createSlice({
         answerSequence: [], // Array<'Correct'|'Incorrect'>
         answerIndexSequence: [], // number[]
         experimentStartTime: new Date().getTime(),
+        metrics: null,
+        selectAnswerEventName: null,
 
         // play controls
         repsPerTrainingClip: 1, // between 1 and (<number of reps in data.json> - 1)
@@ -127,11 +123,11 @@ export const appSlice = createSlice({
          */
         openConfigPanel: (state) => {
             state.isConfigPanelOpen = true;
-            logText(state, 'Config Panel', '- -', 'Open', 'Config panel open');
+            logText(state, 'Config Panel Open');
         },
         closeConfigPanel: (state) => {
             state.isConfigPanelOpen = false;
-            logText(state, 'Config Panel', '- -', 'Closed', 'Config panel closed');
+            logText(state, 'Config Panel Close');
         },
         nextPage: (state) => {
             state.currentPage += 1;
@@ -157,24 +153,11 @@ export const appSlice = createSlice({
          * store answer from users
          */
         selectAnswer: (state, action) => {
-            state.selectedAnswer = action.payload.index;
-            logText(state, 'Select', 'Selected Answer', state.selectedAnswer, action.payload.text);
+            state.selectedAnswer = action.payload;
+            logText(state, state.selectAnswerEventName);
         },
         clearSelectedAnswer: (state) => {
             state.selectedAnswer = null;
-        },
-
-        /*
-         * logs
-         */
-        logAction: (state, action) => {
-            logText(
-                state,
-                action.payload.action,
-                action.payload.parameter,
-                action.payload.rawData,
-                action.payload.explanation
-            );
         },
 
         /*
@@ -201,12 +184,18 @@ export const appSlice = createSlice({
         addTimeoutID: (state, action) => {
             state.timeoutIDs.push(action.payload);
         },
-        setPlayingClip: (state, action) => {
-            muteAllSounds(state);
-            state.playingClipIndex = action.payload;
-        },
         clearAllAudios: (state) => {
             muteAllSounds(state);
+        },
+        onAudioPlayed: (state, action) => {
+            muteAllSounds(state);
+            state.playingClipIndex = action.payload.index;
+            logText(state, 'Play', `${action.payload.title} (${action.payload.name})`);
+        },
+        onAudioStopped: (state, action) => {
+            muteAllSounds(state);
+            state.playingClipIndex = null;
+            logText(state, 'Stop', `${action.payload.title} (${action.payload.name})`);
         },
 
         /*
@@ -271,20 +260,32 @@ export const appSlice = createSlice({
             state.currentStage = 'welcome';
             state.currentPage = 0;
             state.numberOfPagesInCurrentStage = 1;
+            switch (state.experimentType) {
+                case 'areTheyTheSame':
+                    state.metrics = 'Confidence Level';
+                    state.selectAnswerEventName = 'VAS Moved';
+                    break;
+                case 'whoTypedIt':
+                    state.metrics = 'Identified Typist';
+                    state.selectAnswerEventName = 'Typist Selected';
+                    break;
+                default:
+                    break;
+            }
         },
         welcomeScreenOnStart: (state) => {
             state.currentStage = 'experiment';
             state.currentPage = 0;
             state.numberOfPagesInCurrentStage = state.typistSequence.length;
             state.experimentStartTime = new Date().getTime();
-            logNewQuestion(state);
+            logText(state, 'New Question');
         },
         // submit answer and log whether true or false
         submitAnswer: (state, action) => {
             muteAllSounds(state);
 
             // log users' answer and update UI
-            logText(state, 'Submit', 'Selected Answer', state.selectedAnswer, action.payload);
+            logText(state, 'Submit', null, action.payload);
             state.answerSequence.push(action.payload);
             state.answerIndexSequence.push(state.selectedAnswer);
             state.currentPage += 1;
@@ -301,7 +302,7 @@ export const appSlice = createSlice({
                 state.currentTrainingTypistNameList = state.typistSequence[state.currentPage].slice();
                 state.currentTestTypistIndex = getRandomInt(state.currentTrainingTypistNameList.length);
                 state.currentTestTypistName = state.currentTrainingTypistNameList[state.currentTestTypistIndex];
-                logNewQuestion(state);
+                logText(state, 'New Question');
             }
         },
     },
@@ -322,8 +323,9 @@ export const {
     setSilenceBetweenReps,
     setPlaybackSpeed,
     addTimeoutID,
-    setPlayingClip,
     clearAllAudios,
+    onAudioPlayed,
+    onAudioStopped,
     setSubjectID,
     changecurrentTestTypistName,
     changeCurrentTrainingTypistName,

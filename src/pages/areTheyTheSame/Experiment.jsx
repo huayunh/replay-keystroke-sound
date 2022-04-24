@@ -70,12 +70,12 @@ function ExperimentPage() {
     const handleSubmit = () => {
         const clipsAreTheSame = currentTrainingTypistNameList.reduce((prev, curr) => prev === curr);
         if (selectedAnswer > 0) {
-            dispatch(submitAnswer(clipsAreTheSame ? 'Correct' : 'Incorrect'));
+            dispatch(submitAnswer(clipsAreTheSame ? 'Correct' : 'Wrong'));
         } else if (selectedAnswer < 0) {
-            dispatch(submitAnswer(clipsAreTheSame ? 'Incorrect' : 'Correct'));
+            dispatch(submitAnswer(clipsAreTheSame ? 'Wrong' : 'Correct'));
         } else {
             // subject was unsure, treat as an incorrect
-            dispatch(submitAnswer('Incorrect'));
+            dispatch(submitAnswer('Wrong'));
         }
 
         setShowSubmitMessage(true);
@@ -157,14 +157,7 @@ function ExperimentPage() {
                                     defaultValue={-99}
                                     onMouseDown={() => setHasInitialConfidenceValue(true)}
                                     onChangeCommitted={(_, val) => {
-                                        dispatch(
-                                            selectAnswer({
-                                                index: val,
-                                                text: `${Math.abs(val)}% confident they are ${
-                                                    val > 0 ? '' : 'not '
-                                                }the same`,
-                                            })
-                                        );
+                                        dispatch(selectAnswer(val));
                                     }}
                                     color={'secondary'}
                                 />

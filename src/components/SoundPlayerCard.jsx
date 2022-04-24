@@ -16,7 +16,7 @@ import KeyStrokeHardSound from '../assets/keystroke-hard.mp3';
 import KeyStrokeLightSound from '../assets/keystroke-light.wav';
 
 // redux
-import { setPlayingClip, clearAllAudios, addTimeoutID, logAction, selectAnswer } from '../redux/appSlice';
+import { onAudioPlayed, onAudioStopped, clearAllAudios, addTimeoutID, selectAnswer } from '../redux/appSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const cardHovered = {
@@ -94,15 +94,7 @@ const SoundPlayerCard = (props) => {
         if (isPlaying) {
             return;
         }
-        dispatch(setPlayingClip(clipIndex));
-        dispatch(
-            logAction({
-                action: 'Play',
-                parameter: 'clipIndex',
-                rawData: clipIndex,
-                explanation: `The clip titled "${title}"${secretIdentifier ? `(${secretIdentifier})` : ''} is played`,
-            })
-        );
+        dispatch(onAudioPlayed({ index: clipIndex, title: title, name: secretIdentifier }));
         setProgress(0);
 
         for (let i = 0; i < downDownTimerStart.length; i++) {
@@ -146,12 +138,12 @@ const SoundPlayerCard = (props) => {
     }, [dispatch, isPlaying, downDownTimerStart, playDuration, playbackSpeed, clipIndex, title, secretIdentifier]);
 
     const handleStop = React.useCallback(() => {
-        dispatch(clearAllAudios());
+        dispatch(onAudioStopped({ index: clipIndex, title: title, name: secretIdentifier }));
         setProgress(null);
         if (playingTimer !== null) {
             clearTimeout(playingTimer);
         }
-    }, [dispatch, playingTimer]);
+    }, [dispatch, playingTimer, clipIndex, title, secretIdentifier]);
 
     React.useEffect(() => {
         return () => {
@@ -206,7 +198,7 @@ const SoundPlayerCard = (props) => {
                             if (disableSelectButton) {
                                 return;
                             }
-                            dispatch(selectAnswer({ index: clipIndex, text: title }));
+                            dispatch(selectAnswer(clipIndex));
                         }}
                     >
                         <Typography
