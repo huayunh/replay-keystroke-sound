@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearAllAudios } from '../redux/appSlice';
 
-import { download, millisecondToHMS } from '../shared/utils';
+import { download, millisecondToHMS, localeDateToISO, UTCDateToISO } from '../shared/utils';
 
 const DownloadButton = () => {
     const dispatch = useDispatch();
@@ -34,8 +34,8 @@ const DownloadButton = () => {
         const timeElapsed = millisecondToHMS(currentTimeDateObj.getTime() - experimentStartTime).string;
         const testCip = experimentType === 'whoTypedIt' ? ',Test Clip' : '';
         let summary = `Subject ID,${subjectID}
-Experiment Start (Local),${startTimeDateObj.toLocaleString().replace(',', '')}
-Experiment Start (UTC),${startTimeDateObj.toUTCString().replace(',', '')}
+Experiment Start (Local),${localeDateToISO(startTimeDateObj)}
+Experiment Start (UTC),${UTCDateToISO(startTimeDateObj)}
 Experiment Start (UTC/ISO Format),${startTimeDateObj.toISOString()}
 Time Elapsed (hh:mm:ss.ddd),${timeElapsed}
 Task Type,${experimentType}
@@ -76,7 +76,7 @@ Question No.,${metrics},Question Answered Correctly?
         summary += `=========
 Event Log
 =========
-Subject ID,Question No.,Timestamp (UTC/ISO Format),Timestamp (Local),Time Elapsed (hh:mm:ss.ddd),${typistSequence[0]
+Subject ID,Question No.,Timestamp (UTC),Timestamp (Local),Time Elapsed (hh:mm:ss.ddd),${typistSequence[0]
             .map((_, typistIndex) => `Typist ${typistIndex + 1}`)
             .join(',')}${testCip},Event,Typist Played,${metrics},Decision
 `;

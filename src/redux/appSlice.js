@@ -8,6 +8,8 @@ import {
     objectToURLParameter,
     getURLParameterObject,
     millisecondToHMS,
+    localeDateToISO,
+    UTCDateToISO,
 } from '../shared/utils';
 import Data from '../assets/data.json';
 
@@ -53,8 +55,8 @@ const muteAllSounds = (state) => {
 
 const logText = (state, event, typistPlayed = null, decision = null) => {
     const currentTime = new Date();
-    const timestampUTCISO = currentTime.toISOString();
-    const timestampLocal = `${currentTime.toLocaleDateString()} ${currentTime.toLocaleTimeString()}`;
+    const timestampLocal = localeDateToISO(currentTime);
+    const timestampUTCISO = UTCDateToISO(currentTime);
     const timeElapsed = millisecondToHMS(currentTime.getTime() - state.timestamp).string;
     const testClip = state.experimentType === 'whoTypedIt' ? ',' + state.currentTestTypistName : '';
     let answerFromSubject = null;
