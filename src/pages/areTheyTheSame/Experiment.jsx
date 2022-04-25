@@ -59,12 +59,15 @@ function ExperimentPage() {
     const numberOfScreensInCurrentPhase = useSelector((state) => state.app.numberOfScreensInCurrentPhase);
     const silenceBetweenReps = useSelector((state) => state.app.silenceBetweenReps);
     const currentTrainingTypistNameList = useSelector((state) => state.app.currentTrainingTypistNameList);
+    const playingClipIndex = useSelector((state) => state.app.playingClipIndex);
+    const playbackSpeed = useSelector((state) => state.app.playbackSpeed);
     const [showSubmitMessage, setShowSubmitMessage] = React.useState(false);
     const [showPageBody, setShowPageBody] = React.useState(true);
     const [clipListened, setClipListened] = React.useState(new Array(currentTrainingTypistNameList.length).fill(false));
     const allClipsListened = React.useMemo(() => {
         return clipListened.reduce((prev, curr) => prev && curr);
     }, [clipListened]);
+    const [showSlider, setShowSlider] = React.useState(false);
     const [hasInitialConfidenceValue, setHasInitialConfidenceValue] = React.useState(false);
 
     const handleSubmit = () => {
@@ -90,7 +93,29 @@ function ExperimentPage() {
 
         setClipListened(new Array(currentTrainingTypistNameList.length).fill(false));
         setHasInitialConfidenceValue(false);
+        setShowSlider(false);
     };
+
+    React.useEffect(() => {
+        if (allClipsListened && playingClipIndex !== null) {
+            const playingClipDownDownStartTimes = getDownDownStartTimes(
+                Data[currentTrainingTypistNameList[playingClipIndex]].slice(-repsPerTrainingClip),
+                silenceBetweenReps
+            );
+            const duration =
+                playingClipDownDownStartTimes[playingClipDownDownStartTimes.length - 1] / playbackSpeed + 500;
+            setTimeout(() => {
+                setShowSlider(true);
+            }, duration);
+        }
+    }, [
+        allClipsListened,
+        playingClipIndex,
+        repsPerTrainingClip,
+        playbackSpeed,
+        currentTrainingTypistNameList,
+        silenceBetweenReps,
+    ]);
 
     const getTypistClip = React.useCallback(
         (typistName, typistIndex) => (
@@ -138,10 +163,10 @@ function ExperimentPage() {
                                 {currentTrainingTypistNameList.map(getTypistClip)}
                             </Stack>
                         </Stack>
-                        <Fade in={allClipsListened}>
+                        <Fade in={showSlider}>
                             <Stack spacing={2} style={{ margin: '40px 0' }}>
                                 <Typography variant={'body1'}>
-                                    Click on the blue line below to indicate your answer and how confident you feel
+                                    Click on the purple line below to indicate your answer and how confident you feel
                                     toward your answer:
                                 </Typography>
                                 <Slider
