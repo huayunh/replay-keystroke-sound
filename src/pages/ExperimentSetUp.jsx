@@ -44,7 +44,7 @@ function ExperimentSetUp() {
                             variant={'outlined'}
                             value={subjectID === null ? '' : subjectID}
                             onChange={(e) => {
-                                setSubjectID(e.target.value);
+                                setSubjectID(e.target.value.replace(',', ''));
                             }}
                             onBlur={() => {
                                 setSubjectIDEntered(true);

@@ -8,7 +8,9 @@ function EndPage() {
         <Box>
             <Stack direction={'column'} alignItems={'center'} justifyContent={'center'} marginTop={8}>
                 <Typography variant={'h4'}>Great Job!</Typography>
-                <Typography variant={'subtitle1'}>Please signal your experimenter, blah blah blah.</Typography>
+                <Typography variant={'subtitle1'}>
+                    Thank you for joining our study. Please let your experimenter know that you are finished.
+                </Typography>
             </Stack>
         </Box>
     );
