@@ -210,15 +210,16 @@ export const appSlice = createSlice({
          */
 
         setSubjectID: (state, action) => {
-            const newVal = action.payload;
+            // const newVal = action.payload;
+            state.subjectID = action.payload;
 
-            if (newVal) {
-                state.subjectID = action.payload;
-                updateURLParameters(state, 'subjectID', action.payload);
-            } else {
-                state.subjectID = null;
-                updateURLParameters(state, 'subjectID', undefined);
-            }
+            // if (newVal) {
+            //     state.subjectID = action.payload;
+            //     updateURLParameters(state, 'subjectID', action.payload);
+            // } else {
+            //     state.subjectID = null;
+            //     updateURLParameters(state, 'subjectID', undefined);
+            // }
         },
 
         /*
