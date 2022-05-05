@@ -97,7 +97,7 @@ function ExperimentPage() {
     );
     return (
         <Box sx={[styles.pageRoot, isConfigPanelOpen && styles.pageRootConfigPanelOpen]}>
-            <Stack direction={'column'} spacing={4} sx={{ width: 600, margin: '32px auto 0' }}>
+            <Stack direction={'column'} spacing={3} sx={{ width: 600, margin: '32px auto 0' }}>
                 <Breadcrumbs sx={{ alignItems: 'flex-end' }}>
                     <Typography variant={'h4'}>{currentPage + 1}</Typography>
                     <Typography variant={'h6'} color={'text.secondary'}>
@@ -113,7 +113,7 @@ function ExperimentPage() {
                         >
                             {getTestClip()}
                         </Box>
-                        <Stack direction={'column'} spacing={2}>
+                        <Stack direction={'column'} spacing={1}>
                             <Typography variant={'h4'}>Who typed the Test Clip?</Typography>
                             <Typography variant={'body1'}>
                                 Listen to the two typing samples below, and make your best guess.

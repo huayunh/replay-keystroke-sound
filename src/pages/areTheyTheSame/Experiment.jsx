@@ -143,7 +143,7 @@ function ExperimentPage() {
     );
     return (
         <Box sx={[styles.pageRoot, isConfigPanelOpen && styles.pageRootConfigPanelOpen]}>
-            <Stack direction={'column'} spacing={4} sx={{ width: 600, margin: '32px auto 0' }}>
+            <Stack direction={'column'} spacing={3} sx={{ width: 600, margin: '24px auto 0' }}>
                 <Breadcrumbs sx={{ alignItems: 'flex-end' }}>
                     <Typography variant={'h4'}>{currentPage + 1}</Typography>
                     <Typography variant={'h6'} color={'text.secondary'}>
@@ -152,8 +152,8 @@ function ExperimentPage() {
                 </Breadcrumbs>
                 <Fade in={showPageBody}>
                     <Stack spacing={3}>
-                        <Stack direction={'column'} spacing={4}>
-                            <Stack direction={'column'} spacing={2}>
+                        <Stack direction={'column'} spacing={3}>
+                            <Stack direction={'column'} spacing={1}>
                                 <Typography variant={'h4'}>Are these two typing clips the same?</Typography>
                                 <Typography variant={'body1'}>
                                     Listen to the two typing samples below, and make your best guess.
@@ -164,7 +164,7 @@ function ExperimentPage() {
                             </Stack>
                         </Stack>
                         <Fade in={showSlider}>
-                            <Stack spacing={2} style={{ margin: '40px 0' }}>
+                            <Stack spacing={1} style={{ margin: '32px 0' }}>
                                 <Typography variant={'body1'}>
                                     Click on the purple line below to indicate your answer and how confident you feel
                                     toward your answer:
