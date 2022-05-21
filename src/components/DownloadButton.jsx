@@ -80,7 +80,7 @@ Subject ID,Question No.,Timestamp (UTC),Timestamp (Local),Time Elapsed (hh:mm:ss
             .map((_, typistIndex) => `Typist ${typistIndex + 1}`)
             .join(',')}${testCip},Event,Typist Played,${metrics},Decision
 `;
-        download(`${subjectID}.csv`, summary + logText);
+        download(`${subjectID}_${preset}_${experimentStartTime}.csv`, summary + logText);
     };
 
     return (
