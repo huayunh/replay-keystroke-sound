@@ -97,6 +97,7 @@ function WelcomePage() {
         <Box>
             <Stack width={'100%'} spacing={2} sx={wrapperStyle}>
                 <MobileStepper
+                    padding={0}
                     variant={'dots'}
                     steps={TOTAL_STEPS}
                     activeStep={activeStep}

@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearAllAudios } from '../redux/appSlice';
 
-import { download, millisecondToHMS, localeDateToISO, UTCDateToISO } from '../shared/utils';
+import { download, millisecondToHMS, localeDateToISO, UTCDateToISO, localeDateToISONoPunct } from '../shared/utils';
 
 const DownloadButton = () => {
     const dispatch = useDispatch();
@@ -80,7 +80,7 @@ Subject ID,Question No.,Timestamp (UTC),Timestamp (Local),Time Elapsed (hh:mm:ss
             .map((_, typistIndex) => `Typist ${typistIndex + 1}`)
             .join(',')}${testCip},Event,Typist Played,${metrics},Decision
 `;
-        download(`${subjectID}_${preset}_${experimentStartTime}.csv`, summary + logText);
+        download(`${subjectID}_${preset}_${localeDateToISONoPunct(startTimeDateObj)}.csv`, summary + logText);
     };
 
     return (
