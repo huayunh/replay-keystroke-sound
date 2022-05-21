@@ -83,7 +83,7 @@ const ConfigPanel = () => {
     }, [_repsPerTrainingClip]);
 
     return (
-        <Drawer anchor={'right'} open={isConfigPanelOpen} variant={'persistent'}>
+        <Drawer anchor={'left'} open={isConfigPanelOpen} variant={'persistent'}>
             <Box sx={boxStyle}>
                 <Box margin={2}>
                     <Stack direction={'row'} spacing={2} alignItems={'center'} marginBottom={0.5}>

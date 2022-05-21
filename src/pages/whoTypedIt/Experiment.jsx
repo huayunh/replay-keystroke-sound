@@ -14,25 +14,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { submitAnswer } from '../../redux/appSlice';
 
 import Data from '../../assets/data.json';
-import { CONFIG_PANEL_WIDTH } from '../../shared/constants';
 import { getDownDownStartTimes } from '../../shared/utils';
 
 const styles = {
     pageRoot: {
         width: '100%',
         backgroundColor: 'background.default',
-        transition: (theme) => theme.transitions.create('width'),
-    },
-    pageRootConfigPanelOpen: {
-        width: `calc(100% - ${CONFIG_PANEL_WIDTH}px)`,
-        transition: (theme) => theme.transitions.create('width', { duration: theme.transitions.duration.shorter }),
     },
 };
 
 function ExperimentPage() {
     const dispatch = useDispatch();
     const selectedAnswer = useSelector((state) => state.app.selectedAnswer);
-    const isConfigPanelOpen = useSelector((state) => state.app.isConfigPanelOpen);
     const repsPerTrainingClip = useSelector((state) => state.app.repsPerTrainingClip);
     const currentPage = useSelector((state) => state.app.currentPage);
     const numberOfScreensInCurrentPhase = useSelector((state) => state.app.numberOfScreensInCurrentPhase);
@@ -96,7 +89,7 @@ function ExperimentPage() {
         [currentPage, repsPerTrainingClip, silenceBetweenReps, testClipListened]
     );
     return (
-        <Box sx={[styles.pageRoot, isConfigPanelOpen && styles.pageRootConfigPanelOpen]}>
+        <Box sx={[styles.pageRoot]}>
             <Stack direction={'column'} spacing={3} sx={{ width: 600, margin: '32px auto 0' }}>
                 <Breadcrumbs sx={{ alignItems: 'flex-end' }}>
                     <Typography variant={'h4'}>{currentPage + 1}</Typography>

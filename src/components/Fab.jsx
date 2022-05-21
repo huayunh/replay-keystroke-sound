@@ -5,8 +5,8 @@ import { openConfigPanel } from '../redux/appSlice';
 
 const fabStyle = {
     position: 'absolute',
-    bottom: 24,
-    right: 24,
+    bottom: 16,
+    left: 16,
     opacity: 0,
 };
 
