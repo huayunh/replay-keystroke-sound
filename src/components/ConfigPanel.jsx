@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import Collapse from '@mui/material/Collapse';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Divider, TextField } from '@mui/material';
 import DownloadButton from './DownloadButton';
 
@@ -184,23 +185,29 @@ const ConfigPanel = () => {
                                 setRepsPerTrainingClip(e.target.value);
                             }}
                         />
-                        <TextField
-                            label={'Silence between Reps'}
-                            variant={'outlined'}
-                            value={silenceBetweenReps}
-                            type={'number'}
-                            onBlur={() => {
-                                const newVal = rangeValue_silenceBetweenReps(_silenceBetweenReps, silenceBetweenReps);
-                                setSilenceBetweenReps(newVal);
-                                dispatch(_setSilenceBetweenReps(newVal));
-                            }}
-                            onChange={(e) => {
-                                setSilenceBetweenReps(e.target.value);
-                            }}
-                            InputProps={{
-                                endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                            }}
-                        />
+                        <Collapse in={_repsPerTrainingClip !== 1}>
+                            <TextField
+                                label={'Silence between Reps'}
+                                variant={'outlined'}
+                                value={silenceBetweenReps}
+                                type={'number'}
+                                fullWidth
+                                onBlur={() => {
+                                    const newVal = rangeValue_silenceBetweenReps(
+                                        _silenceBetweenReps,
+                                        silenceBetweenReps
+                                    );
+                                    setSilenceBetweenReps(newVal);
+                                    dispatch(_setSilenceBetweenReps(newVal));
+                                }}
+                                onChange={(e) => {
+                                    setSilenceBetweenReps(e.target.value);
+                                }}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                                }}
+                            />
+                        </Collapse>
                         <FormControl>
                             <InputLabel id="playback-speed">Playback Speed</InputLabel>
                             <Select

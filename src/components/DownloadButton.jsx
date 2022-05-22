@@ -49,9 +49,11 @@ Is Progress Bar Visible,${isProgressBarVisible}
 Use Varied Keystroke Sound,${variedKeystrokeSound}
 `;
         if (experimentType === 'whoTypedIt') {
-            summary += `Repitions for Each Typist Clip,${repsPerTrainingClip}
-Silence between Repitions (ms),${silenceBetweenReps}
+            summary += `Repitions for Each Typist Clip,${repsPerTrainingClip}`;
+            if (repsPerTrainingClip > 1) {
+                summary += `Silence between Repitions (ms),${silenceBetweenReps}
 `;
+            }
         }
         summary += `========================
 Answers to Each Question
