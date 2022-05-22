@@ -10,9 +10,10 @@ import { welcomeScreenOnStart } from '../../redux/appSlice';
 const wrapperStyle = {
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     maxWidth: 600,
-    margin: '64px auto 0',
+    margin: '0 auto',
+    padding: 8,
+    minHeight: '100vh',
 };
 
 function WelcomePage() {
@@ -21,7 +22,9 @@ function WelcomePage() {
     return (
         <Box>
             <Stack spacing={2} sx={wrapperStyle}>
-                <Typography variant={'h4'}>Welcome</Typography>
+                <Typography variant={'h4'} color={'text.primary'}>
+                    Welcome
+                </Typography>
                 <Typography variant={'subtitle1'} color={'text.secondary'}>
                     ("Who typed it" description goes here.)
                 </Typography>

@@ -20,7 +20,9 @@ import { getDownDownStartTimes } from '../../shared/utils';
 const styles = {
     pageRoot: {
         width: '100%',
+        minHeight: '100vh',
         backgroundColor: 'background.default',
+        paddingTop: 3,
     },
 };
 
@@ -136,7 +138,7 @@ function ExperimentPage() {
     );
     return (
         <Box sx={[styles.pageRoot]}>
-            <Stack direction={'column'} spacing={3} sx={{ width: 600, margin: '24px auto 0' }}>
+            <Stack direction={'column'} spacing={3} sx={{ width: 600, margin: '0 auto 0' }}>
                 <Breadcrumbs sx={{ alignItems: 'flex-end' }}>
                     <Typography variant={'h4'}>{currentPage + 1}</Typography>
                     <Typography variant={'h6'} color={'text.secondary'}>
@@ -147,8 +149,10 @@ function ExperimentPage() {
                     <Stack spacing={3}>
                         <Stack direction={'column'} spacing={3}>
                             <Stack direction={'column'} spacing={1}>
-                                <Typography variant={'h4'}>Are these two typing clips the same?</Typography>
-                                <Typography variant={'body1'}>
+                                <Typography variant={'h4'} color={'text.primary'}>
+                                    Are these two typing clips the same?
+                                </Typography>
+                                <Typography variant={'body1'} color={'text.primary'}>
                                     Listen to the two typing samples below, and make your best guess.
                                 </Typography>
                             </Stack>
@@ -158,7 +162,7 @@ function ExperimentPage() {
                         </Stack>
                         <Fade in={showSlider}>
                             <Stack spacing={1} style={{ margin: '32px 0' }}>
-                                <Typography variant={'body1'}>
+                                <Typography variant={'body1'} color={'text.primary'}>
                                     Click on the purple line below to indicate your answer and how confident you feel
                                     toward your answer:
                                 </Typography>

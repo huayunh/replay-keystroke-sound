@@ -15,14 +15,10 @@ import Step2Gif from '../../assets/areTheyTheSame/step-2.gif';
 const wrapperStyle = {
     flexDirection: 'column',
     alignItems: 'stretch',
-    justifyContent: 'center',
-    margin: '48px auto',
+    margin: '0 auto',
     maxWidth: 500,
     padding: 4,
-    marginTop: {
-        xs: 2,
-        md: 4,
-    },
+    minHeight: '100vh',
 };
 
 const mobileStepperStyle = {
@@ -34,7 +30,9 @@ const TOTAL_STEPS = 4;
 const STEP_0 = () => {
     return (
         <div>
-            <Typography variant={'h4'}>Welcome!</Typography>
+            <Typography variant={'h4'} color={'text.primary'}>
+                Welcome!
+            </Typography>
             <Typography variant={'body1'} color={'text.secondary'}>
                 Please click the "NEXT" button above to read instructions about this experiment.
             </Typography>

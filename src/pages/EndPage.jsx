@@ -5,10 +5,12 @@ import Typography from '@mui/material/Typography';
 
 function EndPage() {
     return (
-        <Box>
-            <Stack direction={'column'} alignItems={'center'} justifyContent={'center'} marginTop={8}>
-                <Typography variant={'h4'}>Great Job!</Typography>
-                <Typography variant={'subtitle1'}>
+        <Box paddingTop={8} minHeight={'100vh'}>
+            <Stack direction={'column'} alignItems={'center'} justifyContent={'center'}>
+                <Typography variant={'h4'} color={'text.primary'}>
+                    Great Job!
+                </Typography>
+                <Typography variant={'subtitle1'} color={'text.secondary'}>
                     Thank you for joining our study. Please let your experimenter know that you are finished.
                 </Typography>
             </Stack>
