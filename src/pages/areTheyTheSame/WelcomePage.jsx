@@ -16,7 +16,7 @@ const wrapperStyle = {
     flexDirection: 'column',
     alignItems: 'stretch',
     margin: '0 auto',
-    maxWidth: 500,
+    maxWidth: { xs: 500, md: 700 },
     padding: 4,
     minHeight: '100vh',
 };
