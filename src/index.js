@@ -6,10 +6,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import CssBaseline from '@mui/material/CssBaseline';
 
 ReactDOMClient.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
         <React.StrictMode>
+            <CssBaseline />
             <App />
         </React.StrictMode>
     </Provider>

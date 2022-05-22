@@ -25,6 +25,10 @@ const wrapperStyle = {
     },
 };
 
+const mobileStepperStyle = {
+    padding: 0,
+};
+
 const TOTAL_STEPS = 4;
 
 const STEP_0 = () => {
@@ -97,11 +101,11 @@ function WelcomePage() {
         <Box>
             <Stack width={'100%'} spacing={2} sx={wrapperStyle}>
                 <MobileStepper
-                    padding={0}
                     variant={'dots'}
                     steps={TOTAL_STEPS}
                     activeStep={activeStep}
                     position={'static'}
+                    sx={mobileStepperStyle}
                     nextButton={
                         activeStep !== TOTAL_STEPS - 1 ? (
                             <Button
