@@ -9,6 +9,7 @@ import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/materia
 import { useSelector, useDispatch } from 'react-redux';
 import { setPreset, setSubjectID as _setSubjectID, setUpScreenOnStart } from '../redux/appSlice';
 import useUpdateStateFromURLParameter from '../hooks/useUpdateStateFromURLParameter';
+import { PRESET_KEYS } from '../shared/presets';
 
 const wrapperStyle = {
     flexDirection: 'column',
@@ -71,9 +72,11 @@ function ExperimentSetUp() {
                         >
                             <MenuItem value={'Random'}>Random</MenuItem>
                             <Divider />
-                            <MenuItem value={'Preset A'}>Preset A</MenuItem>
-                            <MenuItem value={'Preset B'}>Preset B</MenuItem>
-                            <MenuItem value={'Preset C'}>Preset C</MenuItem>
+                            {PRESET_KEYS.map((KEY) => (
+                                <MenuItem value={KEY} key={KEY}>
+                                    {KEY}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Stack>

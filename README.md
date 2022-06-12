@@ -140,32 +140,7 @@ root
 
 ### To Change What's In a Preset
 
-The preset values are all stored at `src/shared/constants.js`. To change the value of a preset, you may simply edit the file directly and save.
-
-### To Add / Remove a Preset
-
-Adding / deleting presets would involve changing import statements, so it is a little more complicated than just changing preset contents. If you try to add a new preset, the following places need to be altered.
-
-Specify a new preset in
-
-```
-src/shared/constants.js
-```
-
-Change the import statement and if statement in
-
-```
-src/redux/appSlice.js
-```
-
-Note that you will also want to change those inline comments to keep the documentation consistent; I encourage you to do a full-document search for this file.
-
-Finally, change the UI controls for the Config Panel and the experiment set up page:
-
-```
-src/components/ConfigPanel.jsx
-src/pages/ExperimentSetUp.jsx
-```
+The preset values are all stored at `src/shared/presets.js`. To change the value of a preset, you may simply edit the file directly and save.
 
 ### To Control What's Exported in the Log File
 

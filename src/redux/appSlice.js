@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { PRESET_A, PRESET_B, PRESET_C } from '../shared/constants';
+import { PRESETS, PRESET_KEYS } from '../shared/presets';
 import {
     getRandomInt,
     randomItemsFromArray,
@@ -14,12 +14,8 @@ import {
 import Data from '../assets/data.json';
 
 const initTypists = (state) => {
-    if (state.preset === 'Preset A') {
-        state.typistSequence = PRESET_A.slice();
-    } else if (state.preset === 'Preset B') {
-        state.typistSequence = PRESET_B.slice();
-    } else if (state.preset === 'Preset C') {
-        state.typistSequence = PRESET_C.slice();
+    if (PRESET_KEYS.includes(state.preset)) {
+        state.typistSequence = PRESETS[state.preset].slice();
     } else {
         // by default, choose 5 pairs of typists by random
         const pairsOfTypist = 5;
@@ -116,7 +112,7 @@ export const appSlice = createSlice({
         currentTrainingTypistNameList: [],
         currentTestTypistIndex: null, // index in the name list parameter above
         currentTestTypistName: null,
-        preset: null, // null | 'Random' | 'Preset A' | 'Preset B' | 'Preset C'
+        preset: null, // null | see PRESET_KEYS
 
         URLParameters: getURLParameterObject(),
     },
@@ -247,15 +243,14 @@ export const appSlice = createSlice({
             state.typistSequence[state.currentPage] = state.currentTrainingTypistNameList;
         },
         setPreset: (state, action) => {
-            if (!['Random', 'Preset A', 'Preset B', 'Preset C', null].includes(action.payload)) {
-                return;
-            }
-            state.preset = action.payload;
-            if (action.payload !== null) {
-                initTypists(state);
-                updateURLParameters(state, 'preset', action.payload);
-            } else {
-                updateURLParameters(state, 'preset', undefined);
+            if (PRESET_KEYS.includes(action.payload) || action.payload == null) {
+                state.preset = action.payload;
+                if (action.payload !== null) {
+                    initTypists(state);
+                    updateURLParameters(state, 'preset', action.payload);
+                } else {
+                    updateURLParameters(state, 'preset', undefined);
+                }
             }
         },
 

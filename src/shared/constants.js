@@ -8,28 +8,3 @@ export const IS_KEY_PRESSED_HARD = [true, false, false, false, false, true, fals
 // export const IS_KEY_PRESSED_HARD = [false, false, false, false, false, false, false, false, false, false, false];
 
 export const CONFIG_PANEL_WIDTH = 320;
-
-export const PRESET_A = [
-    ['s003', 's004'],
-    ['s024', 's036'],
-    ['s041', 's057'],
-    ['s002', 's032'],
-];
-
-export const PRESET_B = [
-    ['s002', 's032'],
-    ['s024', 's036'],
-    ['s031', 's056'],
-    ['s003', 's004'],
-    ['s041', 's057'],
-];
-
-export const PRESET_C = [
-    ['s003', 's004'],
-    ['s003', 's003'],
-    ['s008', 's010'],
-    ['s007', 's008'],
-    ['s022', 's024'],
-    ['s015', 's013'],
-    ['s018', 's010'],
-];

@@ -32,6 +32,7 @@ import {
 
 import { rangeValue_repsPerTrainingClip, rangeValue_silenceBetweenReps } from '../shared/utils';
 import { CONFIG_PANEL_WIDTH } from '../shared/constants';
+import { PRESET_KEYS } from '../shared/presets';
 import Data from '../assets/data.json';
 
 const boxStyle = {
@@ -112,9 +113,11 @@ const ConfigPanel = () => {
                             >
                                 <MenuItem value={'Random'}>Random</MenuItem>
                                 <Divider />
-                                <MenuItem value={'Preset A'}>Preset A</MenuItem>
-                                <MenuItem value={'Preset B'}>Preset B</MenuItem>
-                                <MenuItem value={'Preset C'}>Preset C</MenuItem>
+                                {PRESET_KEYS.map((KEY) => (
+                                    <MenuItem value={KEY} key={KEY}>
+                                        {KEY}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         {/* Test Clip */}
