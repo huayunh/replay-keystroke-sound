@@ -31,7 +31,7 @@ export const PRESETS = {
         ['s002', 's002_1.05x'],
         ['s002', 's002'],
     ],
-    'Add Time': [
+    'Add Time (Absolute)': [
         ['s002', 's036'],
         ['s002', 's002_DDie+800ms'],
         ['s002', 's002_DDie+400ms'],
@@ -39,6 +39,14 @@ export const PRESETS = {
         ['s002', 's002_DDoa+150ms'],
         ['s002', 's002_DDfiveShift.r+100ms'],
         ['s002', 's002_DDti+50ms'],
+        ['s002', 's002'],
+    ],
+    'Add Time (Relative)': [
+        ['s002', 's036'],
+        ['s002', 's002_DDie+20%'],
+        ['s002', 's002_DDie+15%'],
+        ['s002', 's002_DDShift.ro+10%'],
+        ['s002', 's002_DDoa+5%'],
         ['s002', 's002'],
     ],
 };

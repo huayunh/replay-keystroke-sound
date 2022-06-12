@@ -41,6 +41,9 @@ Add 200ms
 ...
 Add 400ms
 ...
+Add 5%, 10%, 15% to each "DD" time
+- 's002_DDperiodt+5%'
+...
 */
 
 var s002Data = newData['s002'];
@@ -66,7 +69,7 @@ for (let i = 0; i < speeds.length; i++) {
 var KEYS = ['period', 't', 'i', 'e', 'five', 'Shift.r', 'o', 'a', 'n', 'l', 'Return'];
 var addedMilliseconds = [50, 100, 150, 200, 400, 800];
 for (let i = 0; i < addedMilliseconds.length; i++) {
-    const delta = addedMilliseconds[i];
+    var delta = addedMilliseconds[i];
     for (let j = 0; j < KEYS.length - 1; j++) {
         var typistName = `s002_DD${KEYS[j]}${KEYS[j + 1]}+${delta}ms`;
         newData.typists.push(typistName);
@@ -75,6 +78,23 @@ for (let i = 0; i < addedMilliseconds.length; i++) {
             var newRepData = Object.assign({}, s002Data[rep]);
             var manipulatedKey = `DD.${KEYS[j]}.${KEYS[j + 1]}`;
             newRepData[manipulatedKey] = (parseFloat(newRepData[manipulatedKey]) + delta / 1000).toFixed(4);
+            newData[typistName].push(newRepData);
+        }
+    }
+}
+
+// manipulate relative duration
+var addedPercentages = [5, 10, 15, 20];
+for (let i = 0; i < addedPercentages.length; i++) {
+    var delta = addedPercentages[i];
+    for (let j = 0; j < KEYS.length - 1; j++) {
+        var typistName = `s002_DD${KEYS[j]}${KEYS[j + 1]}+${delta}%`;
+        newData.typists.push(typistName);
+        newData[typistName] = [];
+        for (var rep = 0; rep < s002Data.length; rep++) {
+            var newRepData = Object.assign({}, s002Data[rep]);
+            var manipulatedKey = `DD.${KEYS[j]}.${KEYS[j + 1]}`;
+            newRepData[manipulatedKey] = (parseFloat(newRepData[manipulatedKey]) * (delta / 100 + 1)).toFixed(4);
             newData[typistName].push(newRepData);
         }
     }
